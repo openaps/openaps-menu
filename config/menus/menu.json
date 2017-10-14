@@ -1,0 +1,82 @@
+[
+  {
+    "label": "OpenAPS",
+    "menu": [
+      {
+        "label": "Status",
+        "command": "./scripts/getstatus.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Enacted Reason",
+        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Show pump-loop.log",
+        "command": "cat /var/log/openaps/pump-loop.log | fold -w 23 -s | grep -av '.......................' | tail -8",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Test 0",
+        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Test 2",
+        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Test 3",
+        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Test 4",
+        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
+        "emit": "showoutput"
+      }
+    ]
+  },
+  {
+    "label": "Wifi",
+    "menu": [
+      {
+        "label": "Current Wifi Network",
+        "command": "./scripts/getwifi.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Current Hostname",
+        "command": "./scripts/gethostname.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Current IP Address",
+        "command": "./scripts/getip.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Show network.log",
+        "command": "cat /var/log/openaps/network.log | fold -w 23 -s | tail -8",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Select Open Wifi Net",
+        "options": "./scripts/list_open_wifi.sh",
+        "selectScript": "./scripts/add_open_wifi.sh",
+        "selectEmit": "showoutput"
+      }
+    ]
+  },
+  {
+    "label": "Voltage",
+    "emit": "showvoltage"
+  },
+  {
+    "label": "Unicorn",
+    "command": "cat unicorn.txt",
+    "emit": "showoutput"
+  }
+]

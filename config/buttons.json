@@ -1,0 +1,10 @@
+{
+  "pins": {
+    "buttonUp": 11,
+    "buttonDown": 13
+  },
+  "options": {
+    "pressed": 200,
+    "clicked": 400
+  }
+}

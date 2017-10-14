@@ -1,0 +1,19 @@
+{
+  "name": "oaps-hid",
+  "version": "1.0.0",
+  "description": "OpenAPS human interface device application for Pi Zero W Explorer HAT.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "extend": "^3.0.1",
+    "i2c-bus": "^1.2.2",
+    "menube": "^1.0.3",
+    "oled-font-5x7": "^1.0.0",
+    "oled-i2c-bus": "git+https://github.com/bnielsen1965/oled-i2c-bus.git",
+    "rpi-gpio-buttons": "^1.0.2"
+  }
+}

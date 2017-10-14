@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenAPS Menu service for Explorer HAT.
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/src/openaps-menu
+ExecStart=/root/src/openaps-menu/openaps-menu.sh
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+
