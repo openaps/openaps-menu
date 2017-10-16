@@ -22,17 +22,18 @@ var display = require('./lib/display/ssd1306')(displayConfig);
 var voltageConfig = require('./config/voltage.json');
 voltageConfig.i2cBus = i2cBus;
 var voltage = require('./lib/voltage/voltage')(voltageConfig);
-/*
-setInterval(function () {
-  voltage()
-  .then(function (v) {
-    console.log('Voltage: ' + v);
-  })
-  .catch(function (e) {
-    console.log(e.toString());
-  });
-}, 1000);
-*/
+
+// setup socket server for external commands
+var socketServer = require('./lib/socket-server/socket-server')({
+  voltage: voltage
+})
+socketServer
+.on('error', (err) => {
+  console.log('socket-server error: ', err.reason)
+})
+.on('warning', (warn) => {
+  console.log('socket-server warning: ', warn.reason)
+})
 
 
 
@@ -82,10 +83,6 @@ function showMenu(menu) {
     text += (m.selected ? '>' : ' ') + m.label + '\n';
   });
 
-  console.log(text);
+//  console.log(text);
   display.write(text);
 }
-
-
-// show the menu after a slight pause
-//setTimeout(function () { showMenu(hidMenu); }, 2000);
