@@ -27,7 +27,7 @@ var voltage = require('./lib/voltage/voltage')(voltageConfig)
 var batteryConfig = require('./config/battery.json')
 var socketServer = require('./lib/socket-server/socket-server')({
   voltage: voltage,
-  battery: battery
+  battery: batteryConfig
 })
 socketServer
 .on('error', (err) => {
