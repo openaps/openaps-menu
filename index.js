@@ -19,13 +19,15 @@ var display = require('./lib/display/ssd1306')(displayConfig);
 
 
 // setup battery voltage monitor
-var voltageConfig = require('./config/voltage.json');
-voltageConfig.i2cBus = i2cBus;
-var voltage = require('./lib/voltage/voltage')(voltageConfig);
+var voltageConfig = require('./config/voltage.json')
+voltageConfig.i2cBus = i2cBus
+var voltage = require('./lib/voltage/voltage')(voltageConfig)
 
 // setup socket server for external commands
+var batteryConfig = require('./config/battery.json')
 var socketServer = require('./lib/socket-server/socket-server')({
-  voltage: voltage
+  voltage: voltage,
+  battery: battery
 })
 socketServer
 .on('error', (err) => {
