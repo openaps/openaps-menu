@@ -3,13 +3,43 @@
     "label": "OpenAPS",
     "menu": [
       {
+        "label": "Set Temp Target",
+        "menu": [
+            {
+                "label": "Cancel temp targets",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 0 0 | head -1 | jq . | fold -w 23 -s",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Eating Soon: 60m@80",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Speaking: 45m@110",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 110 45 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Walking: 45m@120",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 120 45 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Running: 60m@140",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 140 60 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            }
+        ]
+      },
+      {
         "label": "Status",
         "command": "./scripts/getstatus.sh",
         "emit": "showoutput"
       },
       {
         "label": "Enacted Reason",
-        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
+        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23",
         "emit": "showoutput"
       },
       {
@@ -18,23 +48,8 @@
         "emit": "showoutput"
       },
       {
-        "label": "Test 0",
-        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
-        "emit": "showoutput"
-      },
-      {
-        "label": "Test 2",
-        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
-        "emit": "showoutput"
-      },
-      {
-        "label": "Test 3",
-        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
-        "emit": "showoutput"
-      },
-      {
-        "label": "Test 4",
-        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23 -s",
+        "label": "Unicorn",
+        "command": "cat static/unicorn.txt",
         "emit": "showoutput"
       }
     ]
@@ -71,12 +86,22 @@
     ]
   },
   {
-    "label": "Voltage",
-    "emit": "showvoltage"
-  },
-  {
-    "label": "Unicorn",
-    "command": "cat unicorn.txt",
-    "emit": "showoutput"
+    "label": "System",
+    "menu": [
+        {
+            "label": "Voltage",
+            "emit": "showvoltage"
+        },
+        {
+            "label": "Reboot",
+            "command": "echo Rebooting in; echo 1 minute; shutdown -r",
+            "emit": "showoutput"
+        },
+        {
+            "label": "Cancel Reboot",
+            "command": "shutdown -c; echo Reboot canceled",
+            "emit": "showoutput"
+        }
+    ]
   }
 ]
