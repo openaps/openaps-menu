@@ -1,7 +1,7 @@
 {
-  "name": "oaps-hid",
-  "version": "1.0.0",
-  "description": "OpenAPS human interface device application for Pi Zero W Explorer HAT.",
+  "name": "openaps-menu",
+  "version": "1.0.1",
+  "description": "OpenAPS menu application for Pi Zero W Explorer HAT.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
