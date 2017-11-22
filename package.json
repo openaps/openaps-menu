@@ -14,6 +14,7 @@
     "menube": "^1.0.3",
     "oled-font-5x7": "^1.0.0",
     "oled-i2c-bus": "git+https://github.com/bnielsen1965/oled-i2c-bus.git",
+    "rpi-gpio": "^0.9.1",
     "rpi-gpio-buttons": "^1.0.2"
   }
 }
