@@ -55,7 +55,7 @@
     ]
   },
   {
-    "label": "Wireless",
+    "label": "Wifi",
     "menu": [
       {
         "label": "Current Wifi Network",
@@ -68,7 +68,7 @@
         "emit": "showoutput"
       },
       {
-        "label": "Current IP Addr.",
+        "label": "Current IP Address",
         "command": "./scripts/getip.sh",
         "emit": "showoutput"
       },
@@ -82,11 +82,6 @@
         "options": "./scripts/list_open_wifi.sh",
         "selectScript": "./scripts/add_open_wifi.sh",
         "selectEmit": "showoutput"
-      }
-      {
-      "label": "Reset BT",
-      "command": "systemctl restart bluetooth && bt-pan client AC:37:43:BF:E1:7C",
-      "emit": "showoutput"
       }
     ]
   },
