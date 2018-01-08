@@ -16,8 +16,8 @@
                 "emit": "showoutput"
             },
             {
-                "label": "SMB Nudge: 90m@98",
-                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 98 90 | head -1 | jq . | fold -w 23 -s | head -8",
+                "label": "Speaking: 45m@110",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 110 45 | head -1 | jq . | fold -w 23 -s | head -8",
                 "emit": "showoutput"
             },
             {
@@ -55,18 +55,8 @@
     ]
   },
   {
-    "label": "Wifi",
+    "label": "Wireless",
     "menu": [
-      {
-        "label": "Current IP Addrs",
-        "command": "./scripts/getip.sh",
-        "emit": "showoutput"
-      },
-      {
-        "label": "BT Connect",
-        "command": "sudo bt-pan client AC:37:43:BF:E1:7C && echo 'Pixel Connected'",
-        "emit": "showoutput"
-      },
       {
         "label": "Current Wifi Network",
         "command": "./scripts/getwifi.sh",
@@ -75,6 +65,11 @@
       {
         "label": "Current Hostname",
         "command": "./scripts/gethostname.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Current IP Addr.",
+        "command": "./scripts/getip.sh",
         "emit": "showoutput"
       },
       {
@@ -87,6 +82,11 @@
         "options": "./scripts/list_open_wifi.sh",
         "selectScript": "./scripts/add_open_wifi.sh",
         "selectEmit": "showoutput"
+      }
+      {
+      "label": "Reset BT",
+      "command": "systemctl restart bluetooth && bt-pan client AC:37:43:BF:E1:7C",
+      "emit": "showoutput"
       }
     ]
   },
