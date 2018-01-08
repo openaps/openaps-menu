@@ -93,18 +93,13 @@
             "emit": "showvoltage"
         },
         {
-            "label": "Cancel Reboot",
-            "command": "shutdown -c; echo Reboot canceled",
-            "emit": "showoutput"
-        },
-        {
             "label": "Reboot",
             "command": "echo Rebooting in; echo 1 minute; shutdown -r",
             "emit": "showoutput"
         },
         {
-            "label": "Shutdown Now",
-            "command": "echo Rebooting in; echo 1 minute; shutdown -h now",
+            "label": "Cancel Reboot",
+            "command": "shutdown -c; echo Reboot canceled",
             "emit": "showoutput"
         }
     ]
