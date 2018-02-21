@@ -54,23 +54,32 @@ display.oled.drawLine(2, 40, 5, 40, 1);
 
 //render BG graph
 var x = 5;
-var i = 24;
-var y = ( 21 - ( ( bg[i].glucose - 350 ) / 10 ) );
+var i = 41;
+var y = ( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
 
 while (i >= 0) {
- x = x + 5;
- y = ( 21 - ( ( bg[i].glucose - 350 ) / 10 ) );
+ x = x + 3;
+ y = ( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
  display.oled.drawPixel([x, y, 1]);
  i--;
 }
 
+//calculate timeago for BG
+var startDate = new Date(bg[0].date);
+var endDate = new Date();
+var minutes = ( (endDate.getTime() - startDate.getTime()) / 1000) / 60;
+minutes = Math.round(minutes);
+
 //display BG number
 display.oled.setCursor(0,57);
-display.oled.writeString(font, 1, bg[0].glucose+" m", 1, true);
+display.oled.writeString(font, 1, bg[0].glucose+" "+minutes+"m", 1, true);
 
-//calculate BG age
-// ?????
+//calculate timeago for status
+var startDate = new Date(enacted.deliverAt);
+var endDate = new Date();
+var minutes = ( (endDate.getTime() - startDate.getTime()) / 1000) / 60;
+minutes = Math.round(minutes);
 
 //enacted status
 display.oled.setCursor(0,0);
-display.oled.writeString(font, 1, 'm ago: '+enacted.duration+'m @ '+enacted.rate+'U/h', 1, true);
+display.oled.writeString(font, 1, minutes+'m ago: '+enacted.duration+'m @ '+enacted.rate+'U/h '+enacted.COB+'g '+enacted.IOB+'U', 1, true);
