@@ -3,13 +3,18 @@
     "label": "OpenAPS",
     "menu": [
       {
-        "label": "Unicorn",
-	"command": "node scripts/unicorn.js",
+	"label": "Status-gfx",
+	"command": "node scripts/status.js",
 	"emit": "nothing"
       },
       {
-	"label": "Status-gfx",
-	"command": "node scripts/status.js",
+        "label": "Unicorn Logo 1",
+        "command": "cat static/unicorn.txt",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Unicorn Logo 2",
+	"command": "node scripts/unicorn.js",
 	"emit": "nothing"
       },
       {
