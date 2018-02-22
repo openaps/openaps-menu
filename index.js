@@ -62,15 +62,6 @@ var hidMenu = require('./lib/hid-menu/hid-menu')(buttonsConfig, menuConfig);
 
 // configure menu events
 hidMenu
-// display a 128x64 monochrome png on the screen
-//.on('displayunicorn', function () {
-//  pngparse.parseFile('./static/unicorn.png', function(err, image) {
-//  if(err)
-//    throw err
-//  display.clear();
-//  display.oled.drawBitmap(image.data);
-//   });
-//})
 .on('nothing', function () {
 })
 .on('showvoltage', function () {
