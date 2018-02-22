@@ -8,13 +8,8 @@
 	"emit": "nothing"
       },
       {
-        "label": "Jefferson",
-        "command": "node scripts/jefferson.js",
-	"emit": "nothing"
-      },
-      {
-	"label": "Mockup",
-	"command": "node scripts/mockup.js",
+	"label": "Status-gfx",
+	"command": "node scripts/status.js",
 	"emit": "nothing"
       },
       {
@@ -48,7 +43,7 @@
         ]
       },
       {
-        "label": "Status",
+        "label": "Status-txt",
         "command": "./scripts/getstatus.sh",
         "emit": "showoutput"
       },
