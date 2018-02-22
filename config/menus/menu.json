@@ -3,6 +3,21 @@
     "label": "OpenAPS",
     "menu": [
       {
+        "label": "Unicorn",
+	"command": "node scripts/unicorn.js",
+	"emit": "nothing"
+      },
+      {
+        "label": "Jefferson",
+        "command": "node scripts/jefferson.js",
+	"emit": "nothing"
+      },
+      {
+	"label": "Mockup",
+	"command": "node scripts/mockup.js",
+	"emit": "nothing"
+      },
+      {
         "label": "Set Temp Target",
         "menu": [
             {
@@ -45,11 +60,6 @@
       {
         "label": "Show pump-loop.log",
         "command": "cat /var/log/openaps/pump-loop.log | fold -w 23 -s | grep -av '.......................' | tail -8",
-        "emit": "showoutput"
-      },
-      {
-        "label": "Unicorn",
-        "command": "cat static/unicorn.txt",
         "emit": "showoutput"
       }
     ]
