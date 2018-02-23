@@ -48,7 +48,7 @@ function displayClock() {
   hour = (hour < 10 ? "0" : "") + hour;
   var min  = date.getMinutes();
   min = (min < 10 ? "0" : "") + min;
-  display.oled.setCursor(60, 57);
+  display.oled.setCursor(70, 57);
   display.oled.writeString(font, 1, hour+":"+min, 1, true);
 }
 
@@ -63,38 +63,51 @@ display.oled.drawLine(2, 40, 5, 40, 1);
 
 //render BG graph
 var x = 5;
-var i = 30;
+var i = 36;
 var y = ( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
-
-while (i >= 0) {
- x = x + 2;
- y = ( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
- display.oled.drawPixel([x, y, 1]);
- i--;
+for (i = 36; i >= 0; i--) {
+    x = x + 2;
+    y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
+    if ( y < 21 ) y = 21;
+    if ( y > 51 ) y = 51;
+    display.oled.drawPixel([x, y, 1]);
 }
 
 //render line between actual BG and predicted
-x = x +1;
+x = x + 1;
 display.oled.drawLine(x, 51, x, 21, 1);
 
 //display predictions
-i = 30;
-var y = ( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
-
-while (i >= 0) {
- x = x + 2;
- y = ( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
- display.oled.drawPixel([x, y, 1]);
- i--;
+var predictions = [enacted.predBGs.IOB, enacted.predBGs.ZT, enacted.predBGs.UAM, enacted.predBGs.COB];
+var z = x - 2; //store position in case there are COB
+x = x - 2;
+for (i = 0; i <= 24; i++) {
+    x = x + 2
+    for(var n = 0; n <=2; n++) {
+    y = Math.round( 21 - ( (predictions[n][i] - 250 ) / 8) );
+    if ( y < 21 ) y = 21;
+    if ( y > 51 ) y = 51;
+    display.oled.drawPixel([x, y, 1]);
+    }
 }
+
+//if there are COB, render COB prediction
+if (cob.mealCOB > 0) {
+    x = z; //return to correct position
+        for (i = 0; i <= 24; i++) {
+            x = x + 2
+            y = Math.round( 21 - ( (predictions[3][i] - 250 ) / 8) );
+            if ( y < 21 ) y = 21;
+            if ( y > 51 ) y = 51;
+            display.oled.drawPixel([x, y, 1]);
+        }
+}
+
 
 //calculate timeago for BG
 var startDate = new Date(bg[0].date);
 var endDate = new Date();
-var minutes = ( (endDate.getTime() - startDate.getTime()) / 1000) / 60;
-minutes = Math.round(minutes);
-
-//floor delta so it displays nicely
+var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 var delta = Math.round(bg[0].delta);
 
 //display BG number
@@ -104,8 +117,7 @@ display.oled.writeString(font, 1, bg[0].glucose+"/"+delta+" "+minutes+"m", 1, tr
 //calculate timeago for status
 var startDate = new Date(iob[0].lastTemp.started_at);
 var endDate = new Date();
-var minutes = ( (endDate.getTime() - startDate.getTime()) / 1000) / 60;
-minutes = Math.round(minutes);
+var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 //render enacted status
 display.oled.setCursor(0,0);
 display.oled.writeString(font, 1, enacted.duration+'m @ '+iob[0].lastTemp.rate+'U/h '+'('+minutes+'m)', 1, true);
@@ -117,9 +129,9 @@ display.oled.writeString(font, 1, cob.mealCOB+"g --- "+iob[0].iob+'U', 1, true);
 //fs.stat("/tmp/pump_loop_completed", function(err, stats){
 // var completed = ((new Date().getTime() - stats.mtime) / 1000) / 60;
 // if ( completed < 10 ) {
-//  display.oled.drawCircle(30, 10, 5, 1);
+//  display.oled.drawCircle(30, 10, 5, 1); //drawCircle does not work in this branch
 // }
-// 
+//
 //});
 
 //if pump is suspended, display that in the center of the screen
