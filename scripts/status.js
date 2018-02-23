@@ -83,26 +83,13 @@ var z = x - 2; //store position in case there are COB
 x = x - 2;
 for (i = 0; i <= 24; i++) {
     x = x + 2
-    for(var n = 0; n <=2; n++) {
+    for(var n = 0; n <=3 && (predictions[n] != undefined); n++) {
     y = Math.round( 21 - ( (predictions[n][i] - 250 ) / 8) );
     if ( y < 21 ) y = 21;
     if ( y > 51 ) y = 51;
     display.oled.drawPixel([x, y, 1]);
     }
 }
-
-//if there are COB, render COB prediction
-if (cob.mealCOB > 0) {
-    x = z; //return to correct position
-        for (i = 0; i <= 24; i++) {
-            x = x + 2
-            y = Math.round( 21 - ( (predictions[3][i] - 250 ) / 8) );
-            if ( y < 21 ) y = 21;
-            if ( y > 51 ) y = 51;
-            display.oled.drawPixel([x, y, 1]);
-        }
-}
-
 
 //calculate timeago for BG
 var startDate = new Date(bg[0].date);
