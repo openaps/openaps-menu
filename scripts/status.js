@@ -37,7 +37,7 @@ function displayClock() {
   hour = (hour < 10 ? "0" : "") + hour;
   var min  = date.getMinutes();
   min = (min < 10 ? "0" : "") + min;
-  display.oled.setCursor(70, 57);
+  display.oled.setCursor(83, 57);
   display.oled.writeString(font, 1, hour+":"+min, 1, true);
 }
 
@@ -85,14 +85,18 @@ if (enacted.predBGs != undefined) {
 var startDate = new Date(bg[0].date);
 var endDate = new Date();
 var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
-var delta = Math.round(bg[0].delta);
+if (bg[0].delta) {
+    var delta = Math.round(bg[0].delta);
+} else {
+    var delta = Math.round(bg[0].glucose - bg[1].glucose);
+}
 
 //display BG number, add plus sign if delta is positive
 display.oled.setCursor(0,57);
 if (delta >= 0) {
-    display.oled.writeString(font, 1, bg[0].glucose+"/+"+delta+" "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG:"+bg[0].glucose+"(+"+delta+") "+minutes+"m", 1, true);
 } else {
-    display.oled.writeString(font, 1, bg[0].glucose+"/"+delta+" "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG:"+bg[0].glucose+"("+delta+") "+minutes+"m", 1, true);
 }
 
 //calculate timeago for status
@@ -102,11 +106,11 @@ minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 
 //render enacted status
 display.oled.setCursor(0,0);
-display.oled.writeString(font, 1, enacted.duration+'m @ '+iob[0].lastTemp.rate+'U/h '+'('+minutes+'m)', 1, true);
+display.oled.writeString(font, 1, "TB: "+enacted.duration+'m '+iob[0].lastTemp.rate+'U/h '+'('+minutes+'m)', 1, true);
 
 //parse and render COB/IOB
 display.oled.setCursor(0,8);
-display.oled.writeString(font, 1, cob.mealCOB+"g --- "+iob[0].iob+'U', 1, true);
+display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true);
 
 //render looping icon
 //fs.stat("/tmp/pump_loop_completed", function(err, stats){
