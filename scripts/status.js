@@ -16,6 +16,7 @@ var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfi
 
 //Parse all the .json files we need
 var enacted = JSON.parse(fs.readFileSync("/root/myopenaps/enact/enacted.json"));
+var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
 var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
 var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
 var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
@@ -100,13 +101,15 @@ if (delta >= 0) {
 }
 
 //calculate timeago for status
-startDate = new Date(iob[0].lastTemp.started_at);
+var stats = fs.statSync("/root/myopenaps/monitor/temp_basal.json");
+startDate = new Date(stats.mtime);
 endDate = new Date();
 minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 
 //render enacted status
 display.oled.setCursor(0,0);
-display.oled.writeString(font, 1, "TB: "+enacted.duration+'m '+iob[0].lastTemp.rate+'U/h '+'('+minutes+'m)', 1, true);
+var tempRate = Math.round(temp.rate*10)/10;
+display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1);
 
 //parse and render COB/IOB
 display.oled.setCursor(0,8);
