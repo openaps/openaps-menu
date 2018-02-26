@@ -111,26 +111,3 @@ display.oled.writeString(font, 1, "TB: "+enacted.duration+'m '+iob[0].lastTemp.r
 //parse and render COB/IOB
 display.oled.setCursor(0,8);
 display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true);
-
-//render looping icon
-//fs.stat("/tmp/pump_loop_completed", function(err, stats){
-// var completed = ((new Date().getTime() - stats.mtime) / 1000) / 60;
-// if ( completed < 10 ) {
-//  display.oled.drawCircle(30, 10, 5, 1); //drawCircle does not work in this branch
-// }
-//
-//});
-
-//if pump is suspended, display that in the center of the screen
-
-//var statusjson = fs.readFileSync("/root/myopenaps/monitor/status.json");
-//var status = JSON.parse(statusjson);
-//if ( status.suspended === "true" ) {
-// display.oled.setCursor(44,28);
-// display.oled.writeString(font, 1, "SUSPENDED", 1, true);
-//}
-//if ( status.bolusing === "true" ) {
-// display.oled.setCursor(47,28);
-// display.oled.writeString(font, 1, "BOLUSING", 1, true);
-//}
-
