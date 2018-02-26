@@ -3,19 +3,9 @@
     "label": "OpenAPS",
     "menu": [
       {
-	"label": "Status-gfx",
-	"command": "node scripts/status.js",
-	"emit": "nothing"
-      },
-      {
-        "label": "Unicorn Logo 1",
-        "command": "cat static/unicorn.txt",
-        "emit": "showoutput"
-      },
-      {
-        "label": "Unicorn Logo 2",
-	"command": "node scripts/unicorn.js",
-	"emit": "nothing"
+        "label": "Status Graph",
+        "command": "node scripts/status.js",
+        "emit": "nothing"
       },
       {
         "label": "Set Temp Target",
@@ -48,7 +38,7 @@
         ]
       },
       {
-        "label": "Status-txt",
+        "label": "Status Text",
         "command": "./scripts/getstatus.sh",
         "emit": "showoutput"
       },
@@ -61,6 +51,11 @@
         "label": "Show pump-loop.log",
         "command": "cat /var/log/openaps/pump-loop.log | fold -w 23 -s | grep -av '.......................' | tail -8",
         "emit": "showoutput"
+      },
+      {
+        "label": "Unicorn Logo",
+        "command": "node scripts/unicorn.js",
+        "emit": "nothing"
       }
     ]
   },
