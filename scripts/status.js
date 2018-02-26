@@ -15,12 +15,36 @@ displayConfig.i2cBus = i2cBus;
 var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
 
 //Parse all the .json files we need
-var enacted = JSON.parse(fs.readFileSync("/root/myopenaps/enact/enacted.json"));
-var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
-var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
-var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
-var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
-var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
+try {
+    var enacted = JSON.parse(fs.readFileSync("/root/myopenaps/enact/enacted.json"));
+} catch (e) {
+    return console.error("Could not parse enacted.json: ", e);
+}
+try {
+    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
+} catch (e) {
+    return console.error("Could not parse temp_basal.json: ", e);
+}
+try {
+    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
+} catch (e) {
+    return console.error("Could not parse iob.json: ", e);
+}
+try {
+    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
+} catch (e) {
+    return console.error("Could not parse meal.json: ", e);
+}
+try {
+    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
+} catch (e) {
+    return console.error("Could not parse glucose.json: ", e);
+}
+try {
+    var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
+} catch (e) {
+    return console.error("Could not parse edison-battery.json: ", e);
+}
 
 //Process and display battery gauge
 display.oled.drawLine(115, 57, 127, 57, 1); //top
