@@ -119,9 +119,9 @@ if (bg[0].delta) {
 //display BG number, add plus sign if delta is positive
 display.oled.setCursor(0,57);
 if (delta >= 0) {
-    display.oled.writeString(font, 1, "BG:"+bg[0].glucose+"(+"+delta+") "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG: "+bg[0].glucose+"+"+delta+" "+minutes+"m", 1, true);
 } else {
-    display.oled.writeString(font, 1, "BG:"+bg[0].glucose+"("+delta+") "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG: "+bg[0].glucose+""+delta+" "+minutes+"m", 1, true);
 }
 
 //calculate timeago for status
