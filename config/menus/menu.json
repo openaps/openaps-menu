@@ -3,6 +3,11 @@
     "label": "OpenAPS",
     "menu": [
       {
+        "label": "Status Graph",
+        "command": "node scripts/status.js",
+        "emit": "nothing"
+      },
+      {
         "label": "Set Temp Target",
         "menu": [
             {
@@ -16,8 +21,8 @@
                 "emit": "showoutput"
             },
             {
-                "label": "SMB Nudge: 90m@98",
-                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 98 90 | head -1 | jq . | fold -w 23 -s | head -8",
+                "label": "Speaking: 45m@110",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 110 45 | head -1 | jq . | fold -w 23 -s | head -8",
                 "emit": "showoutput"
             },
             {
@@ -33,7 +38,7 @@
         ]
       },
       {
-        "label": "Status",
+        "label": "Status Text",
         "command": "./scripts/getstatus.sh",
         "emit": "showoutput"
       },
@@ -48,25 +53,15 @@
         "emit": "showoutput"
       },
       {
-        "label": "Unicorn",
-        "command": "cat static/unicorn.txt",
-        "emit": "showoutput"
+        "label": "Unicorn Logo",
+        "command": "node scripts/unicorn.js",
+        "emit": "nothing"
       }
     ]
   },
   {
     "label": "Wifi",
     "menu": [
-      {
-        "label": "Current IP Addrs",
-        "command": "./scripts/getip.sh",
-        "emit": "showoutput"
-      },
-      {
-        "label": "BT Connect",
-        "command": "sudo bt-pan client AC:37:43:BF:E1:7C && echo 'Pixel Connected'",
-        "emit": "showoutput"
-      },
       {
         "label": "Current Wifi Network",
         "command": "./scripts/getwifi.sh",
@@ -75,6 +70,11 @@
       {
         "label": "Current Hostname",
         "command": "./scripts/gethostname.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Current IP Address",
+        "command": "./scripts/getip.sh",
         "emit": "showoutput"
       },
       {
@@ -98,18 +98,13 @@
             "emit": "showvoltage"
         },
         {
-            "label": "Cancel Reboot",
-            "command": "shutdown -c; echo Reboot canceled",
-            "emit": "showoutput"
-        },
-        {
             "label": "Reboot",
             "command": "echo Rebooting in; echo 1 minute; shutdown -r",
             "emit": "showoutput"
         },
         {
-            "label": "Shutdown Now",
-            "command": "echo Rebooting in; echo 1 minute; shutdown -h now",
+            "label": "Cancel Reboot",
+            "command": "shutdown -c; echo Reboot canceled",
             "emit": "showoutput"
         }
     ]

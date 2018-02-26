@@ -1,3 +1,3 @@
 #!/bin/bash
 
-node index.js
+(cd lib/pi-buttons/ && ./a.out) & node index.js
