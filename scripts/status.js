@@ -83,7 +83,7 @@ var date = new Date();
 var zerotime = date.getTime() - ((numBGs * 5) * 600);
 var zero_x = numBGs + 5;
 for (var i = 0; i <= numBGs; i++) {
-    var x = 3 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
+    var x = 2 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
     var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
     //upper and lower boundaries
     if ( y < 21 ) y = 21;
@@ -98,7 +98,6 @@ if (suggested.predBGs != undefined) {
   display.oled.drawLine(x, 51, x, 21, 1);
   //render predictions
   var predictions = [suggested.predBGs.IOB, suggested.predBGs.ZT, suggested.predBGs.UAM, suggested.predBGs.COB];
-  x++;
   for (i = 0; i <= 48; i++) {
       x++;
       for(var n = 0; n <=3 && (predictions[n] != undefined); n++) {
