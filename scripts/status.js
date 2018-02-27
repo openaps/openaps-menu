@@ -43,7 +43,7 @@ try {
 try {
     var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
 } catch (e) {
-    return console.error("Could not parse edison-battery.json: ", e);
+    console.error("Could not parse edison-battery.json: ", e);
 }
 
 //Process and display battery gauge
@@ -52,8 +52,10 @@ display.oled.drawLine(115, 63, 127, 63, 1); //bottom
 display.oled.drawLine(115, 57, 115, 63, 1); //left
 display.oled.drawLine(127, 57, 127, 63, 1); //right
 display.oled.drawLine(114, 59, 114, 61, 1); //iconify
-var batt = Math.round(127 - (batterylevel.battery / 10));
-display.oled.fillRect(batt, 58, 126, 62, 1); //fill battery gauge
+if(batterylevel) {
+    var batt = Math.round(127 - (batterylevel.battery / 10));
+    display.oled.fillRect(batt, 58, 126, 62, 1); //fill battery gauge
+}
 
 //Create and render clock
 function displayClock() {
