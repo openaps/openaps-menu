@@ -15,21 +15,47 @@ displayConfig.i2cBus = i2cBus;
 var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
 
 //Parse all the .json files we need
-var enacted = JSON.parse(fs.readFileSync("/root/myopenaps/enact/enacted.json"));
-var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
-var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
-var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
-var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
-var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
+try {
+    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
+} catch (e) {
+    return console.error("Could not parse suggested.json: ", e);
+}
+try {
+    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
+} catch (e) {
+    return console.error("Could not parse temp_basal.json: ", e);
+}
+try {
+    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
+} catch (e) {
+    return console.error("Could not parse iob.json: ", e);
+}
+try {
+    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
+} catch (e) {
+    return console.error("Could not parse meal.json: ", e);
+}
+try {
+    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
+} catch (e) {
+    return console.error("Could not parse glucose.json: ", e);
+}
+try {
+    var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
+} catch (e) {
+    console.error("Could not parse edison-battery.json: ", e);
+}
 
-//Process and display battery gauge
-display.oled.drawLine(115, 57, 127, 57, 1); //top
-display.oled.drawLine(115, 63, 127, 63, 1); //bottom
-display.oled.drawLine(115, 57, 115, 63, 1); //left
-display.oled.drawLine(127, 57, 127, 63, 1); //right
-display.oled.drawLine(114, 59, 114, 61, 1); //iconify
-var batt = Math.round(127 - (batterylevel.battery / 10));
-display.oled.fillRect(batt, 58, 126, 62, 1); //fill battery gauge
+if(batterylevel) {
+    //Process and display battery gauge
+    display.oled.drawLine(115, 57, 127, 57, 1); //top
+    display.oled.drawLine(115, 63, 127, 63, 1); //bottom
+    display.oled.drawLine(115, 57, 115, 63, 1); //left
+    display.oled.drawLine(127, 57, 127, 63, 1); //right
+    display.oled.drawLine(114, 59, 114, 61, 1); //iconify
+    var batt = Math.round(127 - (batterylevel.battery / 10));
+    display.oled.fillRect(batt, 58, 126, 62, 1); //fill battery gauge
+}
 
 //Create and render clock
 function displayClock() {
@@ -52,10 +78,10 @@ display.oled.drawLine(2, 30, 5, 30, 1);
 display.oled.drawLine(2, 40, 5, 40, 1);
 
 //render BG graph
-var i = (enacted.predBGs != undefined) ? (36) : (60); //fill the whole graph with BGs if there are no predictions
+var i = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole graph with BGs if there are no predictions
 var x = 5; //start in the right place
 for (i; i >= 0; i--) {
-    x = x + 2;
+    x = x + 1;
     var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
     //upper and lower boundaries
     if ( y < 21 ) y = 21;
@@ -64,15 +90,15 @@ for (i; i >= 0; i--) {
 }
 
 //render predictions, only if we have them
-if (enacted.predBGs != undefined) {
+if (suggested.predBGs != undefined) {
   //render line between actual BG and predicted
   x = x + 1;
   display.oled.drawLine(x, 51, x, 21, 1);
   //render predictions
-  var predictions = [enacted.predBGs.IOB, enacted.predBGs.ZT, enacted.predBGs.UAM, enacted.predBGs.COB];
+  var predictions = [suggested.predBGs.IOB, suggested.predBGs.ZT, suggested.predBGs.UAM, suggested.predBGs.COB];
   x = x - 2;
-  for (i = 0; i <= 24; i++) {
-      x = x + 2
+  for (i = 0; i <= 48; i++) {
+      x = x + 1
       for(var n = 0; n <=3 && (predictions[n] != undefined); n++) {
       y = Math.round( 21 - ( (predictions[n][i] - 250 ) / 8) );
       //upper and lower boundaries
@@ -95,9 +121,9 @@ if (bg[0].delta) {
 //display BG number, add plus sign if delta is positive
 display.oled.setCursor(0,57);
 if (delta >= 0) {
-    display.oled.writeString(font, 1, "BG:"+bg[0].glucose+"(+"+delta+") "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG: "+bg[0].glucose+"+"+delta+" "+minutes+"m", 1, true);
 } else {
-    display.oled.writeString(font, 1, "BG:"+bg[0].glucose+"("+delta+") "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG: "+bg[0].glucose+""+delta+" "+minutes+"m", 1, true);
 }
 
 //calculate timeago for status
@@ -106,7 +132,7 @@ startDate = new Date(stats.mtime);
 endDate = new Date();
 minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 
-//render enacted status
+//render current temp basal
 display.oled.setCursor(0,0);
 var tempRate = Math.round(temp.rate*10)/10;
 display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1);
