@@ -84,7 +84,7 @@ var zerotime = date.getTime() - ((numBGs * 5) * 600);
 var zero_x = numBGs + 5;
 for (var i = 0; i <= numBGs; i++) {
     var x = 3 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
-    var y = Math.round( 24 - ( ( bg[i].glucose - 250 ) / 8 ) );
+    var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
     //upper and lower boundaries
     if ( y < 21 ) y = 21;
     if ( y > 51 ) y = 51;
