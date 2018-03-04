@@ -9,6 +9,42 @@ var fs = require('fs');
 var font = require('oled-font-5x7');
 var i2cBus = i2c.openSync(1);
 
+var profile = null;
+if ( process.argv.length > 2)
+{
+  try {
+    profile=JSON.parse(fs.readFileSync(process.argv[2]));
+  } catch (e) {
+    console.error("Could not parse profile.json: ", e);
+  }
+} 
+
+// Rounds value to 'digits' decimal places
+function round(value, digits)
+{
+  if (! digits) { digits = 0; }
+  var scale = Math.pow(10, digits);
+  return Math.round(value * scale) / scale;
+}
+
+function convert_bg(value, profile)
+{
+  if (profile != null && profile.out_units == "mmol/L")
+  {
+    return round(value / 18, 1).toFixed(1);
+  }
+  else
+  {
+    return Math.round(value);
+  }
+}
+
+function stripLeadingZero(value)
+{
+  var re = /^(-)?0+(?=[\.\d])/;
+  return value.toString().replace( re, '$1');
+}
+
 // setup the display
 var displayConfig = require('/root/src/openaps-menu/config/display.json');
 displayConfig.i2cBus = i2cBus;
@@ -121,9 +157,9 @@ if (bg[0].delta) {
 //display BG number, add plus sign if delta is positive
 display.oled.setCursor(0,57);
 if (delta >= 0) {
-    display.oled.writeString(font, 1, "BG: "+bg[0].glucose+"+"+delta+" "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+"+"+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true);
 } else {
-    display.oled.writeString(font, 1, "BG: "+bg[0].glucose+""+delta+" "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+""+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true);
 }
 
 //calculate timeago for status
