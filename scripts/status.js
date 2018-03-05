@@ -9,16 +9,6 @@ var fs = require('fs');
 var font = require('oled-font-5x7');
 var i2cBus = i2c.openSync(1);
 
-var profile = null;
-if ( process.argv.length > 2)
-{
-  try {
-    profile=JSON.parse(fs.readFileSync(process.argv[2]));
-  } catch (e) {
-    console.error("Could not parse profile.json: ", e);
-  }
-} 
-
 // Rounds value to 'digits' decimal places
 function round(value, digits)
 {
@@ -51,6 +41,12 @@ displayConfig.i2cBus = i2cBus;
 var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
 
 //Parse all the .json files we need
+try {
+    var profile = JSON.parse(fs.readFileSync("/root/myopenaps/settings/profile.json"));
+} catch (e) {
+    // Note: profile.json is optional as it's only needed for mmol conversion for now. Print an error, but not return
+    console.error("Could not parse profile.json: ", e);
+}
 try {
     var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
 } catch (e) {
