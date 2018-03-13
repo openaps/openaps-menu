@@ -85,6 +85,9 @@ var zero_x = numBGs + 5;
 for (var i = 0; i <= numBGs; i++) {
     var x = 2 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
     var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
+    //left and right boundaries
+    if ( x < 5 ) x = 5;
+    if ( x > 127 ) x = 127;
     //upper and lower boundaries
     if ( y < 21 ) y = 21;
     if ( y > 51 ) y = 51;
@@ -102,6 +105,8 @@ if (suggested.predBGs != undefined) {
       x++;
       for(var n = 0; n <=3 && (predictions[n] != undefined); n++) {
       y = Math.round( 21 - ( (predictions[n][i] - 250 ) / 8) );
+      //right boundary
+      if ( x > 127 ) x = 127;
       //upper and lower boundaries
       if ( y < 21 ) y = 21;
       if ( y > 51 ) y = 51;
