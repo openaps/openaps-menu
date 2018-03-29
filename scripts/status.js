@@ -48,31 +48,6 @@ try {
     console.error("Could not parse profile.json: ", e);
 }
 try {
-    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
-} catch (e) {
-    return console.error("Could not parse suggested.json: ", e);
-}
-try {
-    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
-} catch (e) {
-    return console.error("Could not parse temp_basal.json: ", e);
-}
-try {
-    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
-} catch (e) {
-    return console.error("Could not parse iob.json: ", e);
-}
-try {
-    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
-} catch (e) {
-    return console.error("Could not parse meal.json: ", e);
-}
-try {
-    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
-} catch (e) {
-    return console.error("Could not parse glucose.json: ", e);
-}
-try {
     var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
 } catch (e) {
     console.error("Could not parse edison-battery.json: ", e);
@@ -109,6 +84,16 @@ display.oled.drawLine(5, 51, 127, 51, 1);
 display.oled.drawLine(2, 30, 5, 30, 1);
 display.oled.drawLine(2, 40, 5, 40, 1);
 
+try {
+    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
+} catch (e) {
+    return console.error("Could not parse suggested.json: ", e);
+}
+try {
+    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
+} catch (e) {
+    return console.error("Could not parse glucose.json: ", e);
+}
 //render BG graph
 var numBGs = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole graph with BGs if there are no predictions
 var date = new Date();
@@ -176,11 +161,28 @@ startDate = new Date(stats.mtime);
 endDate = new Date();
 minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 
+try {
+    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
+} catch (e) {
+    return console.error("Could not parse temp_basal.json: ", e);
+}
+
 //render current temp basal
 display.oled.setCursor(0,0);
 var tempRate = Math.round(temp.rate*10)/10;
 display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1);
 
+try {
+    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
+} catch (e) {
+    return console.error("Could not parse iob.json: ", e);
+}
+
+try {
+    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
+} catch (e) {
+    return console.error("Could not parse meal.json: ", e);
+}
 //parse and render COB/IOB
 display.oled.setCursor(0,8);
 display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true);
