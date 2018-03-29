@@ -98,6 +98,11 @@
             "emit": "showvoltage"
         },
         {
+            "label": "lsusb",
+            "command": "lsusb | fold -w 20 -s",
+            "emit": "showoutput"
+        },
+        {
             "label": "Reboot",
             "command": "echo Rebooting in; echo 1 minute; shutdown -r",
             "emit": "showoutput"
