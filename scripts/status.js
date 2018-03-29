@@ -109,6 +109,10 @@ for (var i = 0; i <= numBGs; i++) {
     if ( y < 21 ) y = 21;
     if ( y > 51 ) y = 51;
     display.oled.drawPixel([x, y, 1]);
+    // if we have multiple data points within 3m, look further back to fill in the graph
+    if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
+        numBGs++;
+    }
 }
 
 //render predictions, only if we have them
