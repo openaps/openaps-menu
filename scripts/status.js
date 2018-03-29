@@ -155,17 +155,17 @@ if (delta >= 0) {
     display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+""+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true);
 }
 
+try {
+    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/last_temp_basal.json"));
+} catch (e) {
+    return console.error("Could not parse last_temp_basal.json: ", e);
+}
+
 //calculate timeago for status
-var stats = fs.statSync("/root/myopenaps/monitor/temp_basal.json");
+var stats = fs.statSync("/root/myopenaps/monitor/last_temp_basal.json");
 startDate = new Date(stats.mtime);
 endDate = new Date();
 minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
-
-try {
-    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
-} catch (e) {
-    return console.error("Could not parse temp_basal.json: ", e);
-}
 
 //render current temp basal
 display.oled.setCursor(0,0);
