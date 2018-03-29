@@ -152,8 +152,14 @@ var endDate = new Date();
 var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 if (bg[0].delta) {
     var delta = Math.round(bg[0].delta);
-} else {
+} else if (bg[1] && bg[0].date - bg[1].date > 200000 ) {
     var delta = Math.round(bg[0].glucose - bg[1].glucose);
+} else if (bg[2] && bg[0].date - bg[2].date > 200000 ) {
+    var delta = Math.round(bg[0].glucose - bg[2].glucose);
+} else if (bg[3] && bg[0].date - bg[3].date > 200000 ) {
+    var delta = Math.round(bg[0].glucose - bg[3].glucose);
+} else {
+    var delta = 0;
 }
 
 //display BG number, add plus sign if delta is positive
