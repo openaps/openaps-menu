@@ -99,8 +99,9 @@ var numBGs = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole g
 var date = new Date();
 var zerotime = date.getTime() - ((numBGs * 5) * 600);
 var zero_x = numBGs + 5;
-for (var i = 0; i <= numBGs; i++) {
-    var x = 2 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
+var iterMax = Math.min(numBGs, bg.length)
+for (var i = 0; i < iterMax; ++i) {
+    var x = zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
     var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
     //left and right boundaries
     if ( x < 5 ) x = 5;
@@ -118,7 +119,7 @@ for (var i = 0; i <= numBGs; i++) {
 //render predictions, only if we have them
 if (suggested.predBGs != undefined) {
   //render line between actual BG and predicted
-  x = zero_x + 3;
+  x = zero_x + 1;
   display.oled.drawLine(x, 51, x, 21, 1);
   //render predictions
   var predictions = [suggested.predBGs.IOB, suggested.predBGs.ZT, suggested.predBGs.UAM, suggested.predBGs.COB];
