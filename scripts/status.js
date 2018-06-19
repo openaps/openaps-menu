@@ -99,7 +99,7 @@ var numBGs = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole g
 var date = new Date();
 var zerotime = date.getTime() - ((numBGs * 5) * 600);
 var zero_x = numBGs + 5;
-for (var i = 0; i <= numBGs; i++) {
+for (var i = 0; i < numBGs; i++) {
     if (bg[i] != null) {
         var x = 2 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
         var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
