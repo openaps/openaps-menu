@@ -99,19 +99,21 @@ var numBGs = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole g
 var date = new Date();
 var zerotime = date.getTime() - ((numBGs * 5) * 600);
 var zero_x = numBGs + 5;
-for (var i = 0; i <= numBGs; i++) {
-    var x = 2 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
-    var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
-    //left and right boundaries
-    if ( x < 5 ) x = 5;
-    if ( x > 127 ) x = 127;
-    //upper and lower boundaries
-    if ( y < 21 ) y = 21;
-    if ( y > 51 ) y = 51;
-    display.oled.drawPixel([x, y, 1]);
-    // if we have multiple data points within 3m, look further back to fill in the graph
-    if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
-        numBGs++;
+for (var i = 0; i < numBGs; i++) {
+    if (bg[i] != null) {
+        var x = 2 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
+        var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
+        //left and right boundaries
+        if ( x < 5 ) x = 5;
+        if ( x > 127 ) x = 127;
+        //upper and lower boundaries
+        if ( y < 21 ) y = 21;
+        if ( y > 51 ) y = 51;
+        display.oled.drawPixel([x, y, 1]);
+        // if we have multiple data points within 3m, look further back to fill in the graph
+        if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
+            numBGs++;
+        }
     }
 }
 
