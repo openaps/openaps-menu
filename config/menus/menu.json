@@ -8,6 +8,11 @@
         "emit": "nothing"
       },
       {
+        "label": "Big BG Status",
+        "command": "node scripts/big_bg_status.js",
+        "emit": "nothing"
+      },
+      {
         "label": "Set Temp Target",
         "menu": [
             {
@@ -54,7 +59,7 @@
       },
       {
         "label": "Unicorn Logo",
-        "command": "node scripts/unicorn.js",
+        "command": "node scripts/display_image.js ./static/unicorn.png",
         "emit": "nothing"
       }
     ]
@@ -63,30 +68,29 @@
     "label": "Wifi",
     "menu": [
       {
-        "label": "Current Wifi Network",
-        "command": "./scripts/getwifi.sh",
-        "emit": "showoutput"
+       "label": "Connect Pixel",
+       "command": "nmcli c up 'Pixel Network'",
+       "emit": "showoutput"
       },
       {
-        "label": "Current Hostname",
-        "command": "./scripts/gethostname.sh",
-        "emit": "showoutput"
+       "label": "Disconnect Pixel",
+       "command": "nmcli c down 'Pixel Network'",
+       "emit": "showoutput"
+      },
+      {
+       "label": "Show WiFi Networks",
+       "command": "nmcli --terse --fields IN-USE,SSID device wifi list",
+       "emit": "showoutput"
+      },
+      {
+       "label": "Wireless Status",
+       "command": "nmcli --terse --fields TYPE,CONNECTION,STATE device status",
+       "emit": "showoutput"
       },
       {
         "label": "Current IP Address",
         "command": "./scripts/getip.sh",
         "emit": "showoutput"
-      },
-      {
-        "label": "Show network.log",
-        "command": "cat /var/log/openaps/network.log | fold -w 23 -s | tail -8",
-        "emit": "showoutput"
-      },
-      {
-        "label": "Select Open Wifi Net",
-        "options": "./scripts/list_open_wifi.sh",
-        "selectScript": "./scripts/add_open_wifi.sh",
-        "selectEmit": "showoutput"
       }
     ]
   },
@@ -136,6 +140,11 @@
             "label": "Reboot",
             "command": "echo Rebooting in; echo 1 minute; shutdown -r",
             "emit": "showoutput"
+        },
+        {
+	    "label": "Shutdown Now",
+	    "command": "shutdown -h now",
+	    "emit": "showoutput"
         },
         {
             "label": "Cancel Reboot",
