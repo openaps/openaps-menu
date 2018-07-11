@@ -38,7 +38,7 @@ function setupDisplay() {
     display.clear();
     display.oled.drawBitmap(image.data);
   });
-  return { displayConfig, display };
+  return display;
 }
 
 function setupMenus() {
