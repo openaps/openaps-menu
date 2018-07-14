@@ -1,5 +1,9 @@
 [
   {
+    "label": "Screen Off",
+    "emit": "screenoff"
+  },
+  {
     "label": "OpenAPS",
     "menu": [
       {
@@ -75,6 +79,16 @@
       {
        "label": "Disconnect Pixel",
        "command": "nmcli c down 'Pixel Network'",
+       "emit": "showoutput"
+      },
+      {
+       "label": "Wifi Off",
+       "command": "nmcli radio wifi off",
+       "emit": "showoutput"
+      },
+      {
+       "label": "Wifi On",
+       "command": "nmcli radio wifi on",
        "emit": "showoutput"
       },
       {

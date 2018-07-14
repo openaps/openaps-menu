@@ -40,6 +40,9 @@ var displayConfig = require('/root/src/openaps-menu/config/display.json');
 displayConfig.i2cBus = i2cBus;
 var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
 
+//dim the display
+display.oled.dimDisplay(true);
+
 //Parse all the .json files we need
 try {
     var profile = JSON.parse(fs.readFileSync("/root/myopenaps/settings/profile.json"));
@@ -55,13 +58,13 @@ try {
 
 if(batterylevel) {
     //Process and display battery gauge
-    display.oled.drawLine(115, 57, 127, 57, 1); //top
-    display.oled.drawLine(115, 63, 127, 63, 1); //bottom
-    display.oled.drawLine(115, 57, 115, 63, 1); //left
-    display.oled.drawLine(127, 57, 127, 63, 1); //right
-    display.oled.drawLine(114, 59, 114, 61, 1); //iconify
+    display.oled.drawLine(115, 57, 127, 57, 1, false); //top
+    display.oled.drawLine(115, 63, 127, 63, 1, false); //bottom
+    display.oled.drawLine(115, 57, 115, 63, 1, false); //left
+    display.oled.drawLine(127, 57, 127, 63, 1, false); //right
+    display.oled.drawLine(114, 59, 114, 61, 1, false); //iconify
     var batt = Math.round(127 - (batterylevel.battery / 10));
-    display.oled.fillRect(batt, 58, 126, 62, 1); //fill battery gauge
+    display.oled.fillRect(batt, 58, 126, 62, 1, false); //fill battery gauge
 }
 
 //Create and render clock
@@ -72,17 +75,17 @@ function displayClock() {
   var min  = date.getMinutes();
   min = (min < 10 ? "0" : "") + min;
   display.oled.setCursor(83, 57);
-  display.oled.writeString(font, 1, hour+":"+min, 1, true);
+  display.oled.writeString(font, 1, hour+":"+min, 1, true, false);
 }
 
 displayClock();
 
 //bg graph
-display.oled.drawLine(5, 51, 5, 21, 1);
-display.oled.drawLine(5, 51, 127, 51, 1);
+display.oled.drawLine(5, 51, 5, 21, 1, false);
+display.oled.drawLine(5, 51, 127, 51, 1, false);
 //targets high and low
-display.oled.drawLine(2, 30, 5, 30, 1);
-display.oled.drawLine(2, 40, 5, 40, 1);
+display.oled.drawLine(2, 30, 5, 30, 1, false);
+display.oled.drawLine(2, 40, 5, 40, 1, false);
 
 try {
     var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
@@ -109,7 +112,7 @@ for (var i = 0; i < iterMax; ++i) {
     //upper and lower boundaries
     if ( y < 21 ) y = 21;
     if ( y > 51 ) y = 51;
-    display.oled.drawPixel([x, y, 1]);
+    display.oled.drawPixel([x, y, 1, false]);
     // if we have multiple data points within 3m, look further back to fill in the graph
     if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
         numBGs++;
@@ -120,7 +123,7 @@ for (var i = 0; i < iterMax; ++i) {
 if (suggested.predBGs != undefined) {
   //render line between actual BG and predicted
   x = zero_x + 1;
-  display.oled.drawLine(x, 51, x, 21, 1);
+  display.oled.drawLine(x, 51, x, 21, 1, false);
   //render predictions
   var predictions = [suggested.predBGs.IOB, suggested.predBGs.ZT, suggested.predBGs.UAM, suggested.predBGs.COB];
   for (i = 0; i <= 48; i++) {
@@ -132,7 +135,7 @@ if (suggested.predBGs != undefined) {
       //upper and lower boundaries
       if ( y < 21 ) y = 21;
       if ( y > 51 ) y = 51;
-      display.oled.drawPixel([x, y, 1]);
+      display.oled.drawPixel([x, y, 1, false]);
       }
   }
 }
@@ -155,9 +158,9 @@ if (bg[0].delta) {
 //display BG number, add plus sign if delta is positive
 display.oled.setCursor(0,57);
 if (delta >= 0) {
-    display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+"+"+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+"+"+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true, false);
 } else {
-    display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+""+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true);
+    display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+""+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true, false);
 }
 
 try {
@@ -175,7 +178,7 @@ minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 //render current temp basal
 display.oled.setCursor(0,0);
 var tempRate = Math.round(temp.rate*10)/10;
-display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1);
+display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1, false);
 
 try {
     var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
@@ -190,4 +193,11 @@ try {
 }
 //parse and render COB/IOB
 display.oled.setCursor(0,8);
-display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true);
+display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true, false);
+
+//display everything in the buffer
+display.oled.update();
+
+if ( endDate % 2 == 1 ) { display.oled.invertDisplay(true); } else { display.oled.invertDisplay(false); }
+
+
