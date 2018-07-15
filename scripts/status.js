@@ -58,13 +58,14 @@ try {
 
 if(batterylevel) {
     //Process and display battery gauge
-    display.oled.drawLine(115, 57, 127, 57, 1, false); //top
-    display.oled.drawLine(115, 63, 127, 63, 1, false); //bottom
-    display.oled.drawLine(115, 57, 115, 63, 1, false); //left
+    display.oled.drawLine(116, 57, 127, 57, 1, false); //top
+    display.oled.drawLine(116, 63, 127, 63, 1, false); //bottom
+    display.oled.drawLine(116, 57, 116, 63, 1, false); //left
     display.oled.drawLine(127, 57, 127, 63, 1, false); //right
-    display.oled.drawLine(114, 59, 114, 61, 1, false); //iconify
-    var batt = Math.round(127 - (batterylevel.battery / 10));
-    display.oled.fillRect(batt, 58, 126, 62, 1, false); //fill battery gauge
+    display.oled.drawLine(115, 59, 115, 61, 1, false); //iconify
+    var battRect = Math.round(batterylevel.battery / 10);
+    var battX = (127 - battRect);
+    display.oled.fillRect(battX, 58, battRect, 5, 1, false); //fill battery gauge
 }
 
 //Create and render clock
@@ -212,6 +213,3 @@ display.oled.update();
 
 //randomly invert display to evenly wear the OLED diodes
 display.oled.invertDisplay((endDate % 2 == 1));
-
-
-
