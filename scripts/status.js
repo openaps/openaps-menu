@@ -55,13 +55,13 @@ try {
 
 if(batterylevel) {
     //Process and display battery gauge
-    display.oled.drawLine(115, 57, 127, 57, 1); //top
-    display.oled.drawLine(115, 63, 127, 63, 1); //bottom
-    display.oled.drawLine(115, 57, 115, 63, 1); //left
+    display.oled.drawLine(116, 57, 127, 57, 1); //top
+    display.oled.drawLine(116, 63, 127, 63, 1); //bottom
+    display.oled.drawLine(116, 57, 116, 63, 1); //left
     display.oled.drawLine(127, 57, 127, 63, 1); //right
-    display.oled.drawLine(114, 59, 114, 61, 1); //iconify
-    var batt = Math.round(127 - (batterylevel.battery / 10));
-    display.oled.fillRect(batt, 58, 126, 62, 1); //fill battery gauge
+    display.oled.drawLine(115, 59, 115, 61, 1); //iconify
+    var batt = Math.round(batterylevel.battery / 10);
+    display.oled.fillRect(127-batt, 58, batt, 5, 1); //fill battery gauge
 }
 
 //Create and render clock
