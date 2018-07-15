@@ -93,8 +93,8 @@ try {
     return console.error("Status screen display error: could not parse meal.json: ", e);
 }
 
+//Process and display battery gauge, if we can
 if(batterylevel) {
-    //Process and display battery gauge
     display.oled.drawLine(116, 57, 127, 57, 1, false); //top
     display.oled.drawLine(116, 63, 127, 63, 1, false); //bottom
     display.oled.drawLine(116, 57, 116, 63, 1, false); //left
@@ -113,7 +113,7 @@ clockMin = (clockMin < 10 ? "0" : "") + clockMin;
 display.oled.setCursor(83, 57);
 display.oled.writeString(font, 1, clockHour+":"+clockMin, 1, true, false);
 
-//display reason for not looping and move the graph to make room for the message!
+//display reason for not looping and move the graph to make room for the message and to draw attention to it!
 var notLoopingReason = suggested.reason;
 display.oled.setCursor(0,16);
 var yOffset = 0;
@@ -130,9 +130,11 @@ else if (notLoopingReason.includes("CGM is calibrating")) {
     yOffset = 3;
 }
 else if (notLoopingReason.includes("CGM data is unchanged")) {
-    display.oled.writeString(font, 1, "CGM is unchanged", 1, true, false);
+    display.oled.writeString(font, 1, "CGM data unchanged", 1, true, false);
     yOffset = 3;
 }
+//add more on-screen warnings/messages here, maybe some special ones for xdrip-js users
+
 
 //bg graph axes
 display.oled.drawLine(5, 51+yOffset, 5, 21+yOffset, 1, false);
@@ -218,16 +220,16 @@ startDate = new Date(stats.mtime);
 endDate = new Date();
 minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 
-//render current temp basal
+//display current temp basal
 display.oled.setCursor(0,0);
 var tempRate = Math.round(temp.rate*10)/10;
 display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1, false);
 
-//parse and render COB/IOB
+//display COB/IOB line
 display.oled.setCursor(0,8);
 display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, false, false);
 
-//display everything in the buffer
+//write to the screen
 display.oled.update();
 
 //randomly invert display to evenly wear the OLED diodes
