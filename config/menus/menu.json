@@ -98,6 +98,41 @@
             "emit": "showvoltage"
         },
         {
+            "label": "Display Tests",
+            "menu": [
+                {
+                    "label": "Checkerboard 1",
+                    "command": "node scripts/display_image.js ./static/cb1.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "Checkerboard 2",
+                    "command": "node scripts/display_image.js ./static/cb2.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "All On",
+                    "command": "node scripts/display_image.js ./static/allon.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "Boxes 1",
+                    "command": "node scripts/display_image.js ./static/boxs1.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "Boxes 2",
+                    "command": "node scripts/display_image.js ./static/boxs2.png",
+                    "emit": "nothing"
+                }
+            ]
+        },
+        {
+            "label": "lsusb",
+            "command": "lsusb | fold -w 20 -s",
+            "emit": "showoutput"
+        },
+        {
             "label": "Reboot",
             "command": "echo Rebooting in; echo 1 minute; shutdown -r",
             "emit": "showoutput"

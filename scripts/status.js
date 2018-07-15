@@ -48,31 +48,6 @@ try {
     console.error("Could not parse profile.json: ", e);
 }
 try {
-    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
-} catch (e) {
-    return console.error("Could not parse suggested.json: ", e);
-}
-try {
-    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/temp_basal.json"));
-} catch (e) {
-    return console.error("Could not parse temp_basal.json: ", e);
-}
-try {
-    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
-} catch (e) {
-    return console.error("Could not parse iob.json: ", e);
-}
-try {
-    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
-} catch (e) {
-    return console.error("Could not parse meal.json: ", e);
-}
-try {
-    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
-} catch (e) {
-    return console.error("Could not parse glucose.json: ", e);
-}
-try {
     var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
 } catch (e) {
     console.error("Could not parse edison-battery.json: ", e);
@@ -91,7 +66,7 @@ if(batterylevel) {
 
 //Create and render clock
 function displayClock() {
-  var date=new Date();
+  var date = new Date();
   var hour = date.getHours();
   hour = (hour < 10 ? "0" : "") + hour;
   var min  = date.getMinutes();
@@ -109,30 +84,52 @@ display.oled.drawLine(5, 51, 127, 51, 1);
 display.oled.drawLine(2, 30, 5, 30, 1);
 display.oled.drawLine(2, 40, 5, 40, 1);
 
+try {
+    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
+} catch (e) {
+    return console.error("Could not parse suggested.json: ", e);
+}
+try {
+    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
+} catch (e) {
+    return console.error("Could not parse glucose.json: ", e);
+}
 //render BG graph
-var i = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole graph with BGs if there are no predictions
-var x = 5; //start in the right place
-for (i; i >= 0; i--) {
-    x = x + 1;
-    var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
-    //upper and lower boundaries
-    if ( y < 21 ) y = 21;
-    if ( y > 51 ) y = 51;
-    display.oled.drawPixel([x, y, 1]);
+var numBGs = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole graph with BGs if there are no predictions
+var date = new Date();
+var zerotime = date.getTime() - ((numBGs * 5) * 600);
+var zero_x = numBGs + 5;
+for (var i = 0; i < numBGs; i++) {
+    if (bg[i] != null) {
+        var x = 2 + zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
+        var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
+        //left and right boundaries
+        if ( x < 5 ) x = 5;
+        if ( x > 127 ) x = 127;
+        //upper and lower boundaries
+        if ( y < 21 ) y = 21;
+        if ( y > 51 ) y = 51;
+        display.oled.drawPixel([x, y, 1]);
+        // if we have multiple data points within 3m, look further back to fill in the graph
+        if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
+            numBGs++;
+        }
+    }
 }
 
 //render predictions, only if we have them
 if (suggested.predBGs != undefined) {
   //render line between actual BG and predicted
-  x = x + 1;
+  x = zero_x + 3;
   display.oled.drawLine(x, 51, x, 21, 1);
   //render predictions
   var predictions = [suggested.predBGs.IOB, suggested.predBGs.ZT, suggested.predBGs.UAM, suggested.predBGs.COB];
-  x = x - 2;
   for (i = 0; i <= 48; i++) {
-      x = x + 1
+      x++;
       for(var n = 0; n <=3 && (predictions[n] != undefined); n++) {
       y = Math.round( 21 - ( (predictions[n][i] - 250 ) / 8) );
+      //right boundary
+      if ( x > 127 ) x = 127;
       //upper and lower boundaries
       if ( y < 21 ) y = 21;
       if ( y > 51 ) y = 51;
@@ -146,8 +143,14 @@ var endDate = new Date();
 var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 if (bg[0].delta) {
     var delta = Math.round(bg[0].delta);
-} else {
+} else if (bg[1] && bg[0].date - bg[1].date > 200000 ) {
     var delta = Math.round(bg[0].glucose - bg[1].glucose);
+} else if (bg[2] && bg[0].date - bg[2].date > 200000 ) {
+    var delta = Math.round(bg[0].glucose - bg[2].glucose);
+} else if (bg[3] && bg[0].date - bg[3].date > 200000 ) {
+    var delta = Math.round(bg[0].glucose - bg[3].glucose);
+} else {
+    var delta = 0;
 }
 
 //display BG number, add plus sign if delta is positive
@@ -158,8 +161,14 @@ if (delta >= 0) {
     display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+""+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true);
 }
 
+try {
+    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/last_temp_basal.json"));
+} catch (e) {
+    return console.error("Could not parse last_temp_basal.json: ", e);
+}
+
 //calculate timeago for status
-var stats = fs.statSync("/root/myopenaps/monitor/temp_basal.json");
+var stats = fs.statSync("/root/myopenaps/monitor/last_temp_basal.json");
 startDate = new Date(stats.mtime);
 endDate = new Date();
 minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
@@ -169,6 +178,17 @@ display.oled.setCursor(0,0);
 var tempRate = Math.round(temp.rate*10)/10;
 display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1);
 
+try {
+    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
+} catch (e) {
+    return console.error("Could not parse iob.json: ", e);
+}
+
+try {
+    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
+} catch (e) {
+    return console.error("Could not parse meal.json: ", e);
+}
 //parse and render COB/IOB
 display.oled.setCursor(0,8);
 display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true);
