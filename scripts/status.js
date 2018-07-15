@@ -35,10 +35,17 @@ function stripLeadingZero(value)
   return value.toString().replace( re, '$1');
 }
 
-// setup the display
+//setup the display
 var displayConfig = require('/root/src/openaps-menu/config/display.json');
 displayConfig.i2cBus = i2cBus;
-var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
+
+//check to see if the display works, exit with error code if it doesn't
+try {
+    var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
+} catch (e) {
+    console.error("Could not set up display:\n", e);
+    process.exit(1);
+}
 
 //dim the display
 display.oled.dimDisplay(true);
@@ -47,7 +54,7 @@ display.oled.dimDisplay(true);
 try {
     var profile = JSON.parse(fs.readFileSync("/root/myopenaps/settings/profile.json"));
 } catch (e) {
-    // Note: profile.json is optional as it's only needed for mmol conversion for now. Print an error, but not return
+    // Note: profile.json is optional as it's only needed for mmol conversion and target lines. Print an error, but not return
     console.error("Could not parse profile.json: ", e);
 }
 try {
@@ -55,39 +62,11 @@ try {
 } catch (e) {
     console.error("Could not parse edison-battery.json: ", e);
 }
-
-if(batterylevel) {
-    //Process and display battery gauge
-    display.oled.drawLine(116, 57, 127, 57, 1, false); //top
-    display.oled.drawLine(116, 63, 127, 63, 1, false); //bottom
-    display.oled.drawLine(116, 57, 116, 63, 1, false); //left
-    display.oled.drawLine(127, 57, 127, 63, 1, false); //right
-    display.oled.drawLine(115, 59, 115, 61, 1, false); //iconify
-    var battRect = Math.round(batterylevel.battery / 10);
-    var battX = (127 - battRect);
-    display.oled.fillRect(battX, 58, battRect, 5, 1, false); //fill battery gauge
+try {
+    var status = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/status.json"));
+} catch (e) {
+    console.error("Could not parse status.json: ", e);
 }
-
-//Create and render clock
-function displayClock() {
-  var date = new Date();
-  var hour = date.getHours();
-  hour = (hour < 10 ? "0" : "") + hour;
-  var min  = date.getMinutes();
-  min = (min < 10 ? "0" : "") + min;
-  display.oled.setCursor(83, 57);
-  display.oled.writeString(font, 1, hour+":"+min, 1, true, false);
-}
-
-displayClock();
-
-//bg graph
-display.oled.drawLine(5, 51, 5, 21, 1, false);
-display.oled.drawLine(5, 51, 127, 51, 1, false);
-//targets high and low
-display.oled.drawLine(2, 30, 5, 30, 1, false);
-display.oled.drawLine(2, 40, 5, 40, 1, false);
-
 try {
     var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
 } catch (e) {
@@ -98,25 +77,94 @@ try {
 } catch (e) {
     return console.error("Could not parse glucose.json: ", e);
 }
+try {
+    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/last_temp_basal.json"));
+} catch (e) {
+    return console.error("Could not parse last_temp_basal.json: ", e);
+}
+try {
+    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
+} catch (e) {
+    return console.error("Could not parse iob.json: ", e);
+}
+try {
+    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
+} catch (e) {
+    return console.error("Could not parse meal.json: ", e);
+}
+
+if(batterylevel) {
+    //Process and display battery gauge
+    display.oled.drawLine(116, 57, 127, 57, 1, false); //top
+    display.oled.drawLine(116, 63, 127, 63, 1, false); //bottom
+    display.oled.drawLine(116, 57, 116, 63, 1, false); //left
+    display.oled.drawLine(127, 57, 127, 63, 1, false); //right
+    display.oled.drawLine(115, 59, 115, 61, 1, false); //iconify
+    var batt = Math.round(batterylevel.battery / 10);
+    display.oled.fillRect(127-batt, 58, batt, 5, 1, false); //fill battery gauge
+}
+
+//render clock
+var clockDate = new Date();
+var clockHour = clockDate.getHours();
+clockHour = (clockHour < 10 ? "0" : "") + clockHour;
+var clockMin  = clockDate.getMinutes();
+clockMin = (clockMin < 10 ? "0" : "") + clockMin;
+display.oled.setCursor(83, 57);
+display.oled.writeString(font, 1, clockHour+":"+clockMin, 1, true, false);
+
+//display reason for not looping and move the graph to make room for the message!
+var notLoopingReason = suggested.reason;
+display.oled.setCursor(0,16);
+var yOffset = 0;
+if (status.suspended == true) {
+    display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, true, false);
+    yOffset = 3;
+}
+else if (status.bolusing == true) {
+    display.oled.writeString(font, 1, "PUMP BOLULSING", 1, true, false);
+    yOffset = 3;
+}
+else if (notLoopingReason.includes("CGM is calibrating")) {
+    display.oled.writeString(font, 1, "CGM calib./???/noisy", 1, true, false);
+    yOffset = 3;
+}
+else if (notLoopingReason.includes("CGM data is unchanged")) {
+    display.oled.writeString(font, 1, "CGM is unchanged", 1, true, false);
+    yOffset = 3;
+}
+
+//bg graph axes
+display.oled.drawLine(5, 51+yOffset, 5, 21+yOffset, 1, false);
+display.oled.drawLine(5, 51+yOffset, 127, 51+yOffset, 1, false);
+
+//display targets high and low
+var targetLow = Math.round( (21+yOffset) - ( ( profile.bg_targets.targets[0].low - 250 ) / 8 ) );
+var targetHigh = Math.round( (21+yOffset) - ( ( profile.bg_targets.targets[0].high - 250 ) / 8 ) );
+
+display.oled.drawLine(2, targetHigh, 5, targetHigh, 1, false);
+display.oled.drawLine(2, targetLow, 5, targetLow, 1, false);
+
 //render BG graph
 var numBGs = (suggested.predBGs != undefined) ? (72) : (120); //fill the whole graph with BGs if there are no predictions
 var date = new Date();
 var zerotime = date.getTime() - ((numBGs * 5) * 600);
 var zero_x = numBGs + 5;
-var iterMax = Math.min(numBGs, bg.length)
-for (var i = 0; i < iterMax; ++i) {
-    var x = zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
-    var y = Math.round( 21 - ( ( bg[i].glucose - 250 ) / 8 ) );
-    //left and right boundaries
-    if ( x < 5 ) x = 5;
-    if ( x > 127 ) x = 127;
-    //upper and lower boundaries
-    if ( y < 21 ) y = 21;
-    if ( y > 51 ) y = 51;
-    display.oled.drawPixel([x, y, 1, false]);
-    // if we have multiple data points within 3m, look further back to fill in the graph
-    if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
-        numBGs++;
+for (var i = 0; i < numBGs; i++) {
+    if (bg[i] != null) {
+        var x = zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
+        var y = Math.round( (21+yOffset) - ( ( bg[i].glucose - 250 ) / 8 ) );
+        //left and right boundaries
+        if ( x < 5 ) x = 5;
+        if ( x > 127 ) x = 127;
+        //upper and lower boundaries
+        if ( y < (21+yOffset) ) y = (21+yOffset);
+        if ( y > (51+yOffset) ) y = (51+yOffset);
+        display.oled.drawPixel([x, y, 1, false]);
+        // if we have multiple data points within 3m, look further back to fill in the graph
+        if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
+          numBGs++;
+        }
     }
 }
 
@@ -124,18 +172,18 @@ for (var i = 0; i < iterMax; ++i) {
 if (suggested.predBGs != undefined) {
   //render line between actual BG and predicted
   x = zero_x + 1;
-  display.oled.drawLine(x, 51, x, 21, 1, false);
+  display.oled.drawLine(x, 51+yOffset, x, 21+yOffset, 1, false);
   //render predictions
   var predictions = [suggested.predBGs.IOB, suggested.predBGs.ZT, suggested.predBGs.UAM, suggested.predBGs.COB];
   for (i = 0; i <= 48; i++) {
       x++;
       for(var n = 0; n <=3 && (predictions[n] != undefined); n++) {
-      y = Math.round( 21 - ( (predictions[n][i] - 250 ) / 8) );
+      y = Math.round( (21+yOffset) - ( (predictions[n][i] - 250 ) / 8) );
       //right boundary
       if ( x > 127 ) x = 127;
       //upper and lower boundaries
-      if ( y < 21 ) y = 21;
-      if ( y > 51 ) y = 51;
+      if ( y < (21+yOffset) ) y = (21+yOffset);
+      if ( y > (51+yOffset) ) y = (51+yOffset);
       display.oled.drawPixel([x, y, 1, false]);
       }
   }
@@ -164,12 +212,6 @@ if (delta >= 0) {
     display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+""+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, true, false);
 }
 
-try {
-    var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/last_temp_basal.json"));
-} catch (e) {
-    return console.error("Could not parse last_temp_basal.json: ", e);
-}
-
 //calculate timeago for status
 var stats = fs.statSync("/root/myopenaps/monitor/last_temp_basal.json");
 startDate = new Date(stats.mtime);
@@ -181,32 +223,9 @@ display.oled.setCursor(0,0);
 var tempRate = Math.round(temp.rate*10)/10;
 display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutes+'m ago)', 1, false);
 
-try {
-    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
-} catch (e) {
-    return console.error("Could not parse iob.json: ", e);
-}
-
-try {
-    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
-} catch (e) {
-    return console.error("Could not parse meal.json: ", e);
-}
 //parse and render COB/IOB
 display.oled.setCursor(0,8);
-display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true, false);
-
-//if the pump is suspended, display a message to that effect
-try {
-    var pumpstatus = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/status.json"));
-} catch (e) {
-    console.error("Could not parse status.json: ", e);
-}
-
-if ( pumpstatus.suspended == true ) {
-  display.oled.setCursor(28,24);
-  display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, true, false);
-}
+display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, false, false);
 
 //display everything in the buffer
 display.oled.update();

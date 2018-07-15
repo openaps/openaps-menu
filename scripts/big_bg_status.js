@@ -37,7 +37,14 @@ function stripLeadingZero(value)
 // setup the display
 var displayConfig = require('/root/src/openaps-menu/config/display.json');
 displayConfig.i2cBus = i2cBus;
-var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
+
+//check to see if the display works, exit with error code if it doesn't
+try {
+    var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
+} catch (e) {
+    console.error("Could not set up display:\n", e);
+    process.exit(1);
+}
 
 //dim the display
 display.oled.dimDisplay(true);
