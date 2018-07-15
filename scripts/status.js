@@ -195,9 +195,23 @@ try {
 display.oled.setCursor(0,8);
 display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, true, false);
 
+//if the pump is suspended, display a message to that effect
+try {
+    var pumpstatus = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/status.json"));
+} catch (e) {
+    console.error("Could not parse status.json: ", e);
+}
+
+if ( pumpstatus.suspended == true ) {
+  display.oled.setCursor(28,24);
+  display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, true, false);
+}
+
 //display everything in the buffer
 display.oled.update();
 
-if ( endDate % 2 == 1 ) { display.oled.invertDisplay(true); } else { display.oled.invertDisplay(false); }
+//randomly invert display to evenly wear the OLED diodes
+display.oled.invertDisplay((endDate % 2 == 1));
+
 
 

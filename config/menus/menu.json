@@ -1,9 +1,5 @@
 [
   {
-    "label": "Screen Off",
-    "emit": "screenoff"
-  },
-  {
     "label": "OpenAPS",
     "menu": [
       {

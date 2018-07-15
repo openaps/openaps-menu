@@ -64,9 +64,6 @@ var hidMenu = require('./lib/hid-menu/hid-menu')(buttonsConfig, menuConfig);
 hidMenu
 .on('nothing', function () {
 })
-.on('screenoff', function () {
-  display.turnOffDisplay();
-})
 .on('showvoltage', function () {
   voltage()
   .then(function (v) {
