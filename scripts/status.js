@@ -43,7 +43,7 @@ displayConfig.i2cBus = i2cBus;
 try {
     var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
 } catch (e) {
-    console.error("Could not set up display:\n", e);
+    console.error("Could not set up HAT display:\n", e);
     process.exit(1);
 }
 
@@ -55,42 +55,42 @@ try {
     var profile = JSON.parse(fs.readFileSync("/root/myopenaps/settings/profile.json"));
 } catch (e) {
     // Note: profile.json is optional as it's only needed for mmol conversion and target lines. Print an error, but not return
-    console.error("Could not parse profile.json: ", e);
+    console.error("Status screen display error: could not parse profile.json: ", e);
 }
 try {
     var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
 } catch (e) {
-    console.error("Could not parse edison-battery.json: ", e);
+    console.error("Status screen display error: could not parse edison-battery.json: ", e);
 }
 try {
     var status = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/status.json"));
 } catch (e) {
-    console.error("Could not parse status.json: ", e);
+    console.error("Status screen display error: could not parse status.json: ", e);
 }
 try {
     var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
 } catch (e) {
-    return console.error("Could not parse suggested.json: ", e);
+    return console.error("Status screen display error: could not parse suggested.json: ", e);
 }
 try {
     var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
 } catch (e) {
-    return console.error("Could not parse glucose.json: ", e);
+    return console.error("Status screen display error: could not parse glucose.json: ", e);
 }
 try {
     var temp = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/last_temp_basal.json"));
 } catch (e) {
-    return console.error("Could not parse last_temp_basal.json: ", e);
+    return console.error("Status screen display error: could not parse last_temp_basal.json: ", e);
 }
 try {
     var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
 } catch (e) {
-    return console.error("Could not parse iob.json: ", e);
+    return console.error("Status screen display error: could not parse iob.json: ", e);
 }
 try {
     var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
 } catch (e) {
-    return console.error("Could not parse meal.json: ", e);
+    return console.error("Status screen display error: could not parse meal.json: ", e);
 }
 
 if(batterylevel) {

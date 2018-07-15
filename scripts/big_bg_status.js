@@ -42,7 +42,7 @@ displayConfig.i2cBus = i2cBus;
 try {
     var display = require('/root/src/openaps-menu/lib/display/ssd1306')(displayConfig);
 } catch (e) {
-    console.error("Could not set up display:\n", e);
+    console.error("Could not set up HAT display:\n", e);
     process.exit(1);
 }
 
@@ -54,12 +54,32 @@ try {
     var profile = JSON.parse(fs.readFileSync("/root/myopenaps/settings/profile.json"));
 } catch (e) {
     // Note: profile.json is optional as it's only needed for mmol conversion for now. Print an error, but not return
-    console.error("Could not parse profile.json: ", e);
+    console.error("Status screen display error: could not parse profile.json: ", e);
 }
 try {
     var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
 } catch (e) {
-    console.error("Could not parse edison-battery.json: ", e);
+    console.error("Status screen display error: could not parse edison-battery.json: ", e);
+}
+try {
+    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
+} catch (e) {
+    return console.error("Status screen display error: could not parse suggested.json: ", e);
+}
+try {
+    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
+} catch (e) {
+    return console.error("Status screen display error: could not parse glucose.json: ", e);
+}
+try {
+    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
+} catch (e) {
+    return console.error("Status screen display error: could not parse iob.json: ", e);
+}
+try {
+    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
+} catch (e) {
+    return console.error("Status screen display error: could not parse meal.json: ", e);
 }
 
 if(batterylevel) {
@@ -69,20 +89,8 @@ if(batterylevel) {
     display.oled.drawLine(116, 57, 116, 63, 1, false); //left
     display.oled.drawLine(127, 57, 127, 63, 1, false); //right
     display.oled.drawLine(115, 59, 115, 61, 1, false); //iconify
-    var battRect = Math.round(batterylevel.battery / 10);
-    var battX = (127 - battRect);
-    display.oled.fillRect(battX, 58, battRect, 5, 1, false); //fill battery gauge
-}
-
-try {
-    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
-} catch (e) {
-    return console.error("Could not parse suggested.json: ", e);
-}
-try {
-    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
-} catch (e) {
-    return console.error("Could not parse glucose.json: ", e);
+    var batt = Math.round(batterylevel.battery / 10);
+    display.oled.fillRect(127-batt, 58, batt, 5, 1, false); //fill battery gauge
 }
 
 //calculate timeago for BG
@@ -124,19 +132,6 @@ min = (min < 10 ? "0" : "") + min;
 //display last loop time
 display.oled.setCursor(0,57);
 display.oled.writeString(font, 1, "Last loop at: "+hour+":"+min, 1, true, false);
-
-//files for IOB and COB:
-try {
-    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
-} catch (e) {
-    return console.error("Could not parse iob.json: ", e);
-}
-
-try {
-    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
-} catch (e) {
-    return console.error("Could not parse meal.json: ", e);
-}
 
 //parse and render COB/IOB
 display.oled.setCursor(0,23);
