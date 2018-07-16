@@ -1,13 +1,9 @@
-module.exports = graphicalStatus;
-
-function graphicalStatus(display) {
-
 var fs = require('fs');
 var font = require('oled-font-5x7');
 const homeDir = require('os').homedir();
 
 var openapsDir = "/root/myopenaps"; //if you're using a nonstandard OpenAPS directory, set that here
-var evenOLEDwear = false; //if you want to prevent OLED burn-in symptoms by inverting the screen, set this to true
+var evenOLEDwear = true; //if you want to prevent OLED burn-in symptoms by inverting the screen, set this to true
 
 // Rounds value to 'digits' decimal places
 function round(value, digits)
@@ -34,6 +30,14 @@ function stripLeadingZero(value)
   var re = /^(-)?0+(?=[\.\d])/;
   return value.toString().replace( re, '$1');
 }
+
+module.exports = graphicalStatus;
+
+//
+//Start of status display function
+//
+
+function graphicalStatus(display) {
 
 display.oled.clearDisplay(false); //clear display buffer
 
@@ -229,4 +233,6 @@ if (evenOLEDwear == true) {
     display.oled.invertDisplay((endDate % 2 == 1));
 }
 
-}//from graphicalStatus
+ //
+}//End of status display function
+ //
