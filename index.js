@@ -26,6 +26,10 @@ pngparse.parseFile('./static/unicorn.png', function(err, image) {
   display.oled.drawBitmap(image.data);
 });
 
+// load up graphical status scripts
+const graphicalStatus = require('./scripts/status.js');
+const bigBGStatus = require('./scripts/big_bg_status.js');
+
 // setup battery voltage monitor
 var voltageConfig = require('./config/voltage.json')
 voltageConfig.i2cBus = i2cBus
@@ -44,10 +48,9 @@ socketServer
 .on('warning', (warn) => {
   console.log('socket-server warning: ', warn.reason)
 })
-
-// graphical status scripts
-const graphicalStatus = require('./scripts/status.js');
-const bigBGStatus = require('./scripts/big_bg_status.js');
+.on('displaystatus', function () {
+ graphicalStatus(display);
+})
 
 // setup the menus
 var buttonsConfig = require('./config/buttons.json');
