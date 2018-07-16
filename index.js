@@ -35,7 +35,7 @@ var voltage = require('./lib/voltage/voltage')(voltageConfig)
 var batteryConfig = require('./config/battery.json')
 var socketServer = require('./lib/socket-server/socket-server')({
   voltage: voltage,
-  battery: batteryConfig
+  battery: batteryConfig,
 })
 socketServer
 .on('error', (err) => {
@@ -45,7 +45,9 @@ socketServer
   console.log('socket-server warning: ', warn.reason)
 })
 
-
+// graphical status scripts
+const graphicalStatus = require('./scripts/status.js');
+const bigBGStatus = require('./scripts/big_bg_status.js');
 
 // setup the menus
 var buttonsConfig = require('./config/buttons.json');
@@ -63,6 +65,20 @@ var hidMenu = require('./lib/hid-menu/hid-menu')(buttonsConfig, menuConfig);
 // configure menu events
 hidMenu
 .on('nothing', function () {
+})
+.on('showGFXstatus', function () {
+  graphicalStatus(display);
+})
+.on('showbigBGstatus', function () {
+  bigBGStatus(display);
+})
+.on('showlogo', function () {
+ pngparse.parseFile('./static/unicorn.png', function(err, image) {
+  if(err)
+    throw err
+  display.clear();
+  display.oled.drawBitmap(image.data);
+});
 })
 .on('showvoltage', function () {
   voltage()

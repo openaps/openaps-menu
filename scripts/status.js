@@ -1,10 +1,9 @@
+module.exports = graphicalStatus;
 
-'use strict';
+function graphicalStatus(display) {
 
-const i2c = require('i2c-bus');
 var fs = require('fs');
 var font = require('oled-font-5x7');
-var i2cBus = i2c.openSync(1);
 const homeDir = require('os').homedir();
 
 var openapsDir = "/root/myopenaps"; //if you're using a nonstandard OpenAPS directory, set that here
@@ -34,17 +33,6 @@ function stripLeadingZero(value)
 {
   var re = /^(-)?0+(?=[\.\d])/;
   return value.toString().replace( re, '$1');
-}
-
-//setup the display
-var displayConfig = require(homeDir+'/src/openaps-menu/config/display.json');
-displayConfig.i2cBus = i2cBus;
-
-//check to see if the display works, exit with error code if it doesn't
-try {
-    var display = require(homeDir+'/src/openaps-menu/lib/display/ssd1306')(displayConfig);
-} catch (e) {
-    return console.error("Could not set up HAT display:\n", e);
 }
 
 display.oled.clearDisplay(false); //clear display buffer
@@ -240,3 +228,5 @@ display.oled.update(); //write buffer to the screen
 if (evenOLEDwear == true) {
     display.oled.invertDisplay((endDate % 2 == 1));
 }
+
+}//from graphicalStatus

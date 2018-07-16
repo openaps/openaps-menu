@@ -4,13 +4,11 @@
     "menu": [
       {
         "label": "Status Graph",
-        "command": "node scripts/status.js",
-        "emit": "nothing"
+        "emit": "showGFXstatus"
       },
       {
         "label": "Big BG Status",
-        "command": "node scripts/big_bg_status.js",
-        "emit": "nothing"
+        "emit": "showbigBGstatus"
       },
       {
         "label": "Set Temp Target",
@@ -59,8 +57,7 @@
       },
       {
         "label": "Unicorn Logo",
-        "command": "node scripts/display_image.js ./static/unicorn.png",
-        "emit": "nothing"
+        "emit": "showlogo"
       }
     ]
   },
