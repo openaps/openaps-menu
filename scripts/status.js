@@ -105,7 +105,7 @@ if (status && suggested) {
         yOffset = 3;
     }
     else if (status.bolusing == true) {
-        display.oled.writeString(font, 1, "PUMP BOLULSING", 1, false, 0, false);
+        display.oled.writeString(font, 1, "PUMP BOLUSING", 1, false, 0, false);
         yOffset = 3;
     }
     else if (notLoopingReason.includes("CGM is calibrating")) {
