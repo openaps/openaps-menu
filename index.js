@@ -16,19 +16,13 @@ var i2cBus = i2c.openSync(1);
 // setup the display
 var displayConfig = require('./config/display.json');
 displayConfig.i2cBus = i2cBus;
-var display = require('./lib/display/ssd1306')(displayConfig);
 
-// display the logo
-pngparse.parseFile('./static/unicorn.png', function(err, image) {
-  if(err)
-    throw err
-  display.clear();
-  display.oled.drawBitmap(image.data);
-});
-
-// load up graphical status scripts
-const graphicalStatus = require('./scripts/status.js');
-const bigBGStatus = require('./scripts/big_bg_status.js');
+try {
+    var display = require('./lib/display/ssd1306')(displayConfig);
+    displayImage('./static/unicorn.png'); //display logo
+} catch (e) {
+  console.warn("Could not setup display:", e);
+}
 
 // setup battery voltage monitor
 var voltageConfig = require('./config/voltage.json')
@@ -49,8 +43,23 @@ socketServer
   console.log('socket-server warning: ', warn.reason)
 })
 .on('displaystatus', function () {
- graphicalStatus(display);
+ if (display) {
+   graphicalStatus(display);
+ }
 })
+
+function displayImage(pathToImage) {
+    pngparse.parseFile(pathToImage, function(err, image) {
+      if(err)
+        throw err
+      display.clear();
+      display.oled.drawBitmap(image.data);
+    });
+}
+
+// load up graphical status scripts
+const graphicalStatus = require('./scripts/status.js');
+const bigBGStatus = require('./scripts/big_bg_status.js');
 
 // setup the menus
 var buttonsConfig = require('./config/buttons.json');
@@ -76,12 +85,7 @@ hidMenu
   bigBGStatus(display);
 })
 .on('showlogo', function () {
- pngparse.parseFile('./static/unicorn.png', function(err, image) {
-  if(err)
-    throw err
-  display.clear();
-  display.oled.drawBitmap(image.data);
-});
+ displayImage('./static/unicorn.png');
 })
 .on('showvoltage', function () {
   voltage()
