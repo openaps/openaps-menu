@@ -108,16 +108,18 @@ hidMenu
 
 // display the current menu on the display
 function showMenu(menu) {
-  display.clear();
-  var text = '';
+  if (display) {
+    display.clear();
+    var text = '';
 
-  var p = menu.getParentSelect();
-  text += p ? '[' + p.label + ']\n' : '';
-  var c = menu.getCurrentSelect();
-  menu.getActiveMenu().forEach(function (m) {
-    text += (m.selected ? '>' : ' ') + m.label + '\n';
-  });
+    var p = menu.getParentSelect();
+    text += p ? '[' + p.label + ']\n' : '';
+    var c = menu.getCurrentSelect();
+    menu.getActiveMenu().forEach(function (m) {
+      text += (m.selected ? '>' : ' ') + m.label + '\n';
+    });
 
-//  console.log(text);
-  display.write(text);
+    //  console.log(text);
+    display.write(text);
+  }
 }
