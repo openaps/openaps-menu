@@ -1,10 +1,3 @@
-module.exports = bigbgstatus;
-
-function bigbgstatus(display) {
-
-const path = require('path');
-const extend = require('extend');
-var os = require('os');
 var fs = require('fs');
 var font = require('oled-font-5x7');
 
@@ -34,38 +27,45 @@ function stripLeadingZero(value)
   return value.toString().replace( re, '$1');
 }
 
-display.oled.dimDisplay(true); //dim the display
-display.oled.clearDisplay(false); //clear the buffer
+module.exports = bigbgstatus;
+
+//
+//Start of status display function
+//
+
+function bigbgstatus(display, openapsDir) {
+
+display.oled.clearDisplay(true); //clear the buffer
 
 //Parse all the .json files we need
 try {
-    var profile = JSON.parse(fs.readFileSync("/root/myopenaps/settings/profile.json"));
+    var profile = JSON.parse(fs.readFileSync(openapsDir+"/settings/profile.json"));
 } catch (e) {
     // Note: profile.json is optional as it's only needed for mmol conversion for now. Print an error, but not return
     console.error("Status screen display error: could not parse profile.json: ", e);
 }
 try {
-    var batterylevel = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/edison-battery.json"));
+    var batterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/edison-battery.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse edison-battery.json: ", e);
 }
 try {
-    var suggested = JSON.parse(fs.readFileSync("/root/myopenaps/enact/suggested.json"));
+    var suggested = JSON.parse(fs.readFileSync(openapsDir+"/enact/suggested.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse suggested.json: ", e);
 }
 try {
-    var bg = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/glucose.json"));
+    var bg = JSON.parse(fs.readFileSync(openapsDir+"/monitor/glucose.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse glucose.json: ", e);
 }
 try {
-    var iob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/iob.json"));
+    var iob = JSON.parse(fs.readFileSync(openapsDir+"/monitor/iob.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse iob.json: ", e);
 }
 try {
-    var cob = JSON.parse(fs.readFileSync("/root/myopenaps/monitor/meal.json"));
+    var cob = JSON.parse(fs.readFileSync(openapsDir+"/monitor/meal.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse meal.json: ", e);
 }
@@ -139,10 +139,21 @@ if(iob && cob) {
     display.oled.writeString(font, 2, " "+cob.mealCOB+'g', 1, false, 0, false);
 }
 
-//display everything in the buffer
-display.oled.update();
+display.oled.dimDisplay(true); //dim the display
+display.oled.update(); // write buffer to the screen
 
-//fandomly invert display to evenly wear the OLED diodes
-display.oled.invertDisplay((endDate % 2 == 1));
+fs.readFile(openapsDir+"/preferences.json", function (err, data) {
+  if (err) throw err;
+  preferences = JSON.parse(data);
+  if (preferences.wearOLEDevenly == false) {
+    display.oled.invertDisplay(false);
+  } else {
+    display.oled.invertDisplay((endDate % 2 == 1));
+  }
+});
 
-} //from start of function
+ //
+}//End of status display function
+ //
+
+
