@@ -10,6 +10,7 @@ const i2c = require('i2c-bus');
 const path = require('path');
 const pngparse = require('pngparse');
 const extend = require('extend');
+var fs = require('fs');
 
 var i2cBus = i2c.openSync(1);
 
@@ -21,7 +22,7 @@ try {
     var display = require('./lib/display/ssd1306')(displayConfig);
     displayImage('./static/unicorn.png'); //display logo
 } catch (e) {
-  console.warn("Could not setup display:", e);
+    console.warn("Could not setup display:", e);
 }
 
 // setup battery voltage monitor
@@ -44,7 +45,18 @@ socketServer
 })
 .on('displaystatus', function () {
  if (display) {
-   graphicalStatus(display);
+  var preferences;
+  fs.readFile('/root/myopenaps/preferences.json', function (err, data) {
+    if (err) throw err;
+    preferences = JSON.parse(data);
+    if (preferences.status_screen == "bigbgstatus") {
+      bigBGStatus(display);
+    } else if (preferences.status_screen == "off") {
+      //don't auto-update the screen if it's turned off
+    } else {
+       graphStatus(display); //default to graph status
+    }
+  });
  }
 })
 
@@ -58,8 +70,9 @@ function displayImage(pathToImage) {
 }
 
 // load up graphical status scripts
-const graphicalStatus = require('./scripts/status.js');
+const graphStatus = require('./scripts/status.js');
 const bigBGStatus = require('./scripts/big_bg_status.js');
+// if you want to add your own status display script, it will be easiest to replace one of the above!
 
 // setup the menus
 var buttonsConfig = require('./config/buttons.json');
@@ -78,8 +91,8 @@ var hidMenu = require('./lib/hid-menu/hid-menu')(buttonsConfig, menuConfig);
 hidMenu
 .on('nothing', function () {
 })
-.on('showGFXstatus', function () {
-  graphicalStatus(display);
+.on('showgraphstatus', function () {
+  graphStatus(display);
 })
 .on('showbigBGstatus', function () {
   bigBGStatus(display);
@@ -108,16 +121,18 @@ hidMenu
 
 // display the current menu on the display
 function showMenu(menu) {
-  display.clear();
-  var text = '';
+  if (display) {
+    display.clear();
+    var text = '';
 
-  var p = menu.getParentSelect();
-  text += p ? '[' + p.label + ']\n' : '';
-  var c = menu.getCurrentSelect();
-  menu.getActiveMenu().forEach(function (m) {
-    text += (m.selected ? '>' : ' ') + m.label + '\n';
-  });
+    var p = menu.getParentSelect();
+    text += p ? '[' + p.label + ']\n' : '';
+    var c = menu.getCurrentSelect();
+    menu.getActiveMenu().forEach(function (m) {
+      text += (m.selected ? '>' : ' ') + m.label + '\n';
+    });
 
-//  console.log(text);
-  display.write(text);
+    //  console.log(text);
+    display.write(text);
+  }
 }

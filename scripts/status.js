@@ -39,7 +39,7 @@ module.exports = graphicalStatus;
 
 function graphicalStatus(display) {
 
-display.oled.clearDisplay(false); //clear display buffer
+display.oled.clearDisplay(true); //clear display buffer
 
 //Parse all the .json files we need
 try {
@@ -114,6 +114,10 @@ if (status && suggested) {
     }
     else if (notLoopingReason.includes("CGM data is unchanged")) {
         display.oled.writeString(font, 1, "CGM data unchanged", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (notLoopingReason.includes("BG data is too old")) {
+        display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
         yOffset = 3;
     }
 //add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
