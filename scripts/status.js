@@ -1,9 +1,5 @@
 var fs = require('fs');
 var font = require('oled-font-5x7');
-const homeDir = require('os').homedir();
-
-var openapsDir = "/root/myopenaps"; //if you're using a nonstandard OpenAPS directory, set that here
-var evenOLEDwear = true; //if you want to prevent OLED burn-in symptoms by inverting the screen, set this to true
 
 // Rounds value to 'digits' decimal places
 function round(value, digits)
@@ -37,7 +33,7 @@ module.exports = graphicalStatus;
 //Start of status display function
 //
 
-function graphicalStatus(display) {
+function graphicalStatus(display, openapsDir) {
 
 display.oled.clearDisplay(true); //clear display buffer
 
@@ -233,9 +229,15 @@ display.oled.writeString(font, 1, clockHour+":"+clockMin, 1, false, 0, false);
 display.oled.dimDisplay(true); //dim the display
 display.oled.update(); //write buffer to the screen
 
-if (evenOLEDwear == true) {
+fs.readFile(openapsDir+"/preferences.json", function (err, data) {
+  if (err) throw err;
+  preferences = JSON.parse(data);
+  if (preferences.wearOLEDevenly == false) {
+    display.oled.invertDisplay(false);
+  } else {
     display.oled.invertDisplay((endDate % 2 == 1));
-}
+  }
+});
 
  //
 }//End of status display function

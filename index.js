@@ -14,6 +14,8 @@ var fs = require('fs');
 
 var i2cBus = i2c.openSync(1);
 
+var openapsDir = "/root/myopenaps"; //if you're using a nonstandard OpenAPS directory, set that here. NOT RECOMMENDED.
+
 // setup the display
 var displayConfig = require('./config/display.json');
 displayConfig.i2cBus = i2cBus;
@@ -46,15 +48,15 @@ socketServer
 .on('displaystatus', function () {
  if (display) {
   var preferences;
-  fs.readFile('/root/myopenaps/preferences.json', function (err, data) {
+  fs.readFile(openapsDir+'/preferences.json', function (err, data) {
     if (err) throw err;
     preferences = JSON.parse(data);
     if (preferences.status_screen == "bigbgstatus") {
-      bigBGStatus(display);
+      bigBGStatus(display, openapsDir);
     } else if (preferences.status_screen == "off") {
       //don't auto-update the screen if it's turned off
     } else {
-       graphStatus(display); //default to graph status
+      graphStatus(display, openapsDir); //default to graph status
     }
   });
  }
@@ -92,10 +94,10 @@ hidMenu
 .on('nothing', function () {
 })
 .on('showgraphstatus', function () {
-  graphStatus(display);
+  graphStatus(display, openapsDir);
 })
 .on('showbigBGstatus', function () {
-  bigBGStatus(display);
+  bigBGStatus(display, openapsDir);
 })
 .on('showlogo', function () {
  displayImage('./static/unicorn.png');
