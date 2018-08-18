@@ -14,7 +14,7 @@ for gpionum in 17 22 27; do
   fi
 done
 
-for gpionum in 17 22; do
+for gpionum in 17 27; do
   if [ "$(/bin/cat /sys/class/gpio/gpio${gpionum}/direction)" != "in" ]; then
     echo "setting GPIO ${gpionum} direction to inwards"
     echo in > /sys/class/gpio/gpio${gpionum}/direction
@@ -30,11 +30,11 @@ for gpionum in 17 22; do
 done
 
 
-if [ "$(/bin/cat /sys/class/gpio/gpio27/direction)" != "out" ]; then
-  echo "setting GPIO 27 direction to outwards"
-  echo out > /sys/class/gpio/gpio27/direction
+if [ "$(/bin/cat /sys/class/gpio/gpio22/direction)" != "out" ]; then
+  echo "setting GPIO 22 direction to outwards"
+  echo out > /sys/class/gpio/gpio22/direction
 else
-  echo "GPIO 27 already direction outwards"
+  echo "GPIO 22 already direction outwards"
 fi
 
 if [ ! -x $(dirname $0)/buttons ]; then
