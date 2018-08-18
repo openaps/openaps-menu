@@ -1,3 +1,12 @@
-#!/bin/bash
+#!/bin/bash -e
 
-(cd lib/pi-buttons/ && ./setup.sh && ./a.out) & node index.js
+topdir=$(dirname $0)
+buttonsdir=${topdir}/lib/pi-buttons
+
+# GPIO setup and buttons utility build
+${buttonsdir}/setup.sh
+
+# needs to create a socket in cwd
+(cd ${buttonsdir} && ./buttons &)
+
+exec node ${topdir}/index.js
