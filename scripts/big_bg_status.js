@@ -141,13 +141,20 @@ if(iob && cob) {
 
 display.oled.dimDisplay(true); //dim the display
 display.oled.update(); // write buffer to the screen
-
+  
 fs.readFile(openapsDir+"/preferences.json", function (err, data) {
   if (err) throw err;
   preferences = JSON.parse(data);
-  if (preferences.wearOLEDevenly == false) {
+  if (preferences.wearOLEDevenly.includes("off")) {
     display.oled.invertDisplay(false);
-  } else {
+  }
+  else if (preferences.wearOLEDevenly.includes("nightandday") && (clockHour >= 20 || clockHour <= 8)) {
+    display.oled.invertDisplay(false);
+  }
+  else if (preferences.wearOLEDevenly.includes("nightandday") && (clockHour <= 20 || clockHour >= 8)) {
+    display.oled.invertDisplay(true);
+  }
+  else {
     display.oled.invertDisplay((endDate % 2 == 1));
   }
 });
