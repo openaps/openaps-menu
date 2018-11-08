@@ -238,7 +238,7 @@ fs.readFile(openapsDir+"/preferences.json", function (err, data) {
   else if (preferences.wearOLEDevenly.includes("nightandday") && (clockHour >= 20 || clockHour <= 8)) {
     display.oled.invertDisplay(false);
   }
-  else if (preferences.wearOLEDevenly.includes("nightandday") && (clockHour <= 20 || clockHour >= 8)) {
+  else if (preferences.wearOLEDevenly.includes("nightandday") && (clockHour <= 20 && clockHour >= 8)) {
     display.oled.invertDisplay(true);
   }
   else {
