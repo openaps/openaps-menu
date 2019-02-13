@@ -51,9 +51,9 @@ socketServer
   fs.readFile(openapsDir+'/preferences.json', function (err, data) {
     if (err) throw err;
     preferences = JSON.parse(data);
-    if (preferences.status_screen == "bigbgstatus") {
+    if (preferences.status_screen && preferences.status_screen == "bigbgstatus") {
       bigBGStatus(display, openapsDir);
-    } else if (preferences.status_screen == "off") {
+    } else if (preferences.status_screen && preferences.status_screen == "off") {
       //don't auto-update the screen if it's turned off
     } else {
       graphStatus(display, openapsDir); //default to graph status
