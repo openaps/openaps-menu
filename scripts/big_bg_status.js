@@ -145,13 +145,13 @@ display.oled.update(); // write buffer to the screen
 fs.readFile(openapsDir+"/preferences.json", function (err, data) {
   if (err) throw err;
   preferences = JSON.parse(data);
-  if (preferences.wearOLEDevenly.includes("off")) {
+  if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("off")) {
     display.oled.invertDisplay(false);
   }
-  else if (preferences.wearOLEDevenly.includes("nightandday") && (hour >= 20 || hour <= 8)) {
+  else if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("nightandday") && (hour >= 20 || hour <= 8)) {
     display.oled.invertDisplay(false);
   }
-  else if (preferences.wearOLEDevenly.includes("nightandday") && (hour <= 20 && hour >= 8)) {
+  else if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("nightandday") && (hour <= 20 && hour >= 8)) {
     display.oled.invertDisplay(true);
   }
   else {
