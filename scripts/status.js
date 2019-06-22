@@ -134,6 +134,7 @@ if (profile) {
 if (bg) {
     //render BG graph
     var numBGs = ((suggested != undefined) && (suggested.predBGs != undefined)) ? (72) : (120); //fill the whole graph with BGs if there are no predictions    var date = new Date();
+    var date = new Date();
     var zerotime = date.getTime() - ((numBGs * 5) * 600);
     var zero_x = numBGs + 5;
     for (var i = 0; i < numBGs; i++) {
