@@ -74,12 +74,21 @@ try {
 } catch (e) {
     console.error("Status screen display error: could not parse meal.json: ", e);
 }
+try {
+    var pumpbattery = JSON.parse(fs.readFileSync(openapsDir+"/monitor/battery.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse battery.json: ", e);
+}
 
 //display warning messages
-if (status && suggested) {
+if (status && suggested && pumpbattery) {
     var notLoopingReason = suggested.reason;
     display.oled.setCursor(0,16);
-    if (status.suspended == true) {
+    if (pumpbattery.voltage <= 1.25) {
+        display.oled.writeString(font, 1, "LOW PUMP BATT.", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (status.suspended == true) {
         display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, false, 0, false);
         yOffset = 3;
     }
