@@ -1,5 +1,12 @@
 {
-  "title": " ",
-  "height": 32,
-  "displayLines": 4
+  "radiofruit": {
+    "title": " ",
+    "height": 32,
+    "displayLines": 4
+  },
+  "explorerHat": {
+    "title": " ",
+    "height": 64,
+    "displayLines": 8
+  }
 }

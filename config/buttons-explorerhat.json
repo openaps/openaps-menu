@@ -1,0 +1,10 @@
+{
+  "gpios": {
+    "buttonup": 17,
+    "buttondown": 27
+  },
+  "options": {
+    "socketPath": "/var/run/pi-buttons.sock",
+    "reconnectTimeout": 3000
+  }
+}
