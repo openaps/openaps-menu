@@ -29,7 +29,6 @@ if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
   var displayConfig = require('./config/display.json').explorerHat;
 }
 
-console.log(displayConfig);
 displayConfig.i2cBus = i2cBus;
 
 try {
@@ -78,6 +77,8 @@ socketServer
       //don't auto-update the screen if it's turned off
     } else if (preferences.status_screen && preferences.status_screen == "blank") {
       display.clear(true);
+    } else if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
+      radiofruitStatus(display, openapsDir); //radiofruit text status script
     } else {
       graphStatus(display, openapsDir); //default to graph status
     }
@@ -87,6 +88,7 @@ socketServer
 // load up graphical status scripts
 const graphStatus = require('./scripts/status.js');
 const bigBGStatus = require('./scripts/big_bg_status.js');
+const radiofruitStatus = require('./scripts/status-radiofruit.js');
 // if you want to add your own status display script, it will be easiest to replace one of the above!
 
 // setup the menus
@@ -117,6 +119,9 @@ hidMenu
 })
 .on('showbigBGstatus', function () {
   bigBGStatus(display, openapsDir);
+})
+.on('showRadiofruitStatus', function () {
+  radiofruitStatus(display, openapsDir);
 })
 .on('showlogo', function () {
  if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
