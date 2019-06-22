@@ -1,7 +1,7 @@
 {
   "gpios": {
-    "buttonup": 17,
-    "buttondown": 27
+    "buttonUp": 17,
+    "buttonDown": 27
   },
   "options": {
     "socketPath": "/var/run/pi-buttons.sock",
