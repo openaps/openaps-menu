@@ -91,7 +91,7 @@ if(batterylevel) {
     display.oled.fillRect(127-batt, 58, batt, 5, 1, false); //fill battery gauge
 }
 
-//display reason for not looping, and move the graph to make room for the message
+//display warning messages, and move the graph to make room for the message
 var yOffset = 0; //offset for graph, if we need to move it
 if (status && suggested) {
     var notLoopingReason = suggested.reason;
@@ -114,6 +114,10 @@ if (status && suggested) {
     }
     else if (notLoopingReason.includes("BG data is too old")) {
         display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (suggested.carbsReq) {
+        display.oled.writeString(font, 1, "Carbs Requiredd: "+suggested.carbsReq+'g', 1, false, 0, false);
         yOffset = 3;
     }
 //add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
