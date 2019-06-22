@@ -116,6 +116,10 @@ if (status && suggested) {
         display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
         yOffset = 3;
     }
+    else if (notLoopingReason.includes("currenttemp rate")) {
+        display.oled.writeString(font, 1, "Temp. mismatch", 1, false, 0, false);
+        yOffset = 3;
+    }
     else if (suggested.carbsReq) {
         display.oled.writeString(font, 1, "Carbs Requiredd: "+suggested.carbsReq+'g', 1, false, 0, false);
         yOffset = 3;
