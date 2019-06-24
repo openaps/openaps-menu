@@ -9,13 +9,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "extend": "^3.0.1",
-    "i2c-bus": "^1.2.2",
-    "menube": "^1.0.3",
-    "oled-font-5x7": "^1.0.0",
-    "oled-i2c-bus": "git+https://github.com/bnielsen1965/oled-i2c-bus.git",
+    "extend": "^3.0.2",
+    "i2c-bus": "^4.0.10",
+    "menube": "^1.0.4",
+    "oled-font-5x7": "^1.0.3",
+    "oled-i2c-bus": "^1.0.11",
     "pngparse": "^2.0.1",
-    "node-pi-buttons": "git+https://github.com/bnielsen1965/node-pi-buttons.git",
-    "rpi-gpio": "^0.9.1"
+    "node-pi-buttons": "^1.0.1",
+    "rpi-gpio": "^2.1.3"
   }
 }

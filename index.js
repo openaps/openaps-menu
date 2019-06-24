@@ -16,15 +16,39 @@ var i2cBus = i2c.openSync(1);
 
 var openapsDir = "/root/myopenaps"; //if you're using a nonstandard OpenAPS directory, set that here. NOT RECOMMENDED.
 
-// setup the display
-var displayConfig = require('./config/display.json');
+try {
+    var preferences = JSON.parse(fs.readFileSync(openapsDir+"/preferences.json"));
+} catch (e) {
+    console.error("Could not load preferences.json", e);
+}
+
+// setup the display, depending on its size (Eadiofruit is 128x32 and Explorer HAT is 128x64)
+if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
+  var displayConfig = require('./config/display.json').radiofruit;
+} else {
+  var displayConfig = require('./config/display.json').explorerHat;
+}
+
 displayConfig.i2cBus = i2cBus;
 
 try {
     var display = require('./lib/display/ssd1306')(displayConfig);
-    displayImage('./static/unicorn.png'); //display logo
+    if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
+      displayImage('./static/unicorn_128x32.png');
+    } else {
+      displayImage('./static/unicorn_128x64.png');
+    }
 } catch (e) {
     console.warn("Could not setup display:", e);
+}
+
+function displayImage(pathToImage) {
+    pngparse.parseFile(pathToImage, function(err, image) {
+      if(err)
+        throw err
+      display.clear();
+      display.oled.drawBitmap(image.data);
+    });
 }
 
 // setup battery voltage monitor
@@ -47,37 +71,34 @@ socketServer
 })
 .on('displaystatus', function () {
  if (display) {
-  var preferences;
-  fs.readFile(openapsDir+'/preferences.json', function (err, data) {
-    if (err) throw err;
-    preferences = JSON.parse(data);
     if (preferences.status_screen && preferences.status_screen == "bigbgstatus") {
       bigBGStatus(display, openapsDir);
     } else if (preferences.status_screen && preferences.status_screen == "off") {
       //don't auto-update the screen if it's turned off
+    } else if (preferences.status_screen && preferences.status_screen == "blank") {
+      display.clear(true);
+    } else if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
+      radiofruitStatus(display, openapsDir); //radiofruit text status script
     } else {
       graphStatus(display, openapsDir); //default to graph status
     }
-  });
  }
 })
-
-function displayImage(pathToImage) {
-    pngparse.parseFile(pathToImage, function(err, image) {
-      if(err)
-        throw err
-      display.clear();
-      display.oled.drawBitmap(image.data);
-    });
-}
 
 // load up graphical status scripts
 const graphStatus = require('./scripts/status.js');
 const bigBGStatus = require('./scripts/big_bg_status.js');
+const radiofruitStatus = require('./scripts/status-radiofruit.js');
 // if you want to add your own status display script, it will be easiest to replace one of the above!
 
 // setup the menus
-var buttonsConfig = require('./config/buttons.json');
+
+if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
+  var buttonsConfig = require('./config/buttons-radiofruit.json');
+} else {
+  var buttonsConfig = require('./config/buttons-explorerhat.json');
+}
+
 var menuConfig = {
   menuFile: process.cwd() + path.sep + './config/menus/menu.json', // file path for the menu definition
   onChange: showMenu, // method to call when menu changes
@@ -99,8 +120,15 @@ hidMenu
 .on('showbigBGstatus', function () {
   bigBGStatus(display, openapsDir);
 })
+.on('showRadiofruitStatus', function () {
+  radiofruitStatus(display, openapsDir);
+})
 .on('showlogo', function () {
- displayImage('./static/unicorn.png');
+ if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
+   displayImage('./static/unicorn_128x32.png');
+ } else {
+   displayImage('./static/unicorn_128x64.png');
+ }
 })
 .on('showvoltage', function () {
   voltage()
