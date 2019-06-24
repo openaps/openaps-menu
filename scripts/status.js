@@ -130,7 +130,7 @@ if (status && suggested && pumpbattery) {
         yOffset = 3;
     }
     else if (suggested.carbsReq) {
-        display.oled.writeString(font, 1, "Carbs Requiredd: "+suggested.carbsReq+'g', 1, false, 0, false);
+        display.oled.writeString(font, 1, "Carbs Required: "+suggested.carbsReq+'g', 1, false, 0, false);
         yOffset = 3;
     }
 //add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
