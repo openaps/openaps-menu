@@ -143,6 +143,16 @@
             "label": "Cancel Reboot",
             "command": "shutdown -c; echo Reboot canceled",
             "emit": "showoutput"
+        },
+        {
+            "label": "Reboot NOW",
+            "command": "node scripts/display_image.js ./static/black.png; shutdown -r now;",
+            "emit": "nothing"
+        },
+        {
+            "label": "Shutdown",
+            "command": "node scripts/display_image.js ./static/black.png; shutdown -P now",
+            "emit": "nothing"
         }
     ]
   }
