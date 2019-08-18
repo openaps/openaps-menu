@@ -73,6 +73,8 @@ socketServer
  if (display) {
     if (preferences.status_screen && preferences.status_screen == "bigbgstatus") {
       bigBGStatus(display, openapsDir);
+    } else if (preferences.status_screen && preferences.status_screen == "textstatus") {
+      textStatus(display, openapsDir);
     } else if (preferences.status_screen && preferences.status_screen == "off") {
       //don't auto-update the screen if it's turned off
     } else if (preferences.status_screen && preferences.status_screen == "blank") {
@@ -88,6 +90,7 @@ socketServer
 // load up graphical status scripts
 const graphStatus = require('./scripts/status.js');
 const bigBGStatus = require('./scripts/big_bg_status.js');
+const textStatus = require('./scripts/text_status.js');
 const radiofruitStatus = require('./scripts/status-radiofruit.js');
 // if you want to add your own status display script, it will be easiest to replace one of the above!
 

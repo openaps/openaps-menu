@@ -8,6 +8,8 @@ You can set your preferred auto-updating status screen using the following setti
 
 `"status_screen": "bigbgstatus"` will display the big BG status screen (no graph).
 
+`"status_screen": "textstatus"` will display a text based status screen with extended information (no graph).
+
 `"status_screen": "off"` will not auto-update the status screen.
 
 `"status_screen": "blank"` will wipe the screen during the auto-update, but will wake up when you press a button to let you access menu options.
