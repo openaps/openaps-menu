@@ -1,6 +1,7 @@
 var fs = require('fs');
 var font = require('oled-font-5x7');
 var dns = require('dns');
+const {execSync} = require('child_process');
 
 // Rounds value to 'digits' decimal places
 function round(value, digits)
@@ -178,12 +179,15 @@ display.oled.setCursor(50,0);
 display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
 
 // show online connection icon if connected to wifi
-const {execSync} = require('child_process');
-let isOnline = execSync('ifconfig | grep wlan0 -A 1 | grep inet');
-if (isOnline){
-   drawWiFiIcon(display, 95, 0, true);
-} else {
-   drawWiFiIcon(display, 95, 0, false);
+try {
+  let isOnline = execSync('ifconfig | grep wlan0 -A 1 | grep -q inet');
+  if (isOnline == 0){
+     drawWiFiIcon(display, 95, 0, true);
+  } else {
+     drawWiFiIcon(display, 95, 0, false);
+  }
+} catch (e) {
+  drawWiFiIcon(display, 95, 0, false);
 }
 
 // show local battery level
