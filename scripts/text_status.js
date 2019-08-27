@@ -29,23 +29,170 @@ function stripLeadingZero(value)
   return value.toString().replace( re, '$1');
 }
 
-function drawBatteryIcon (display, x0, y0, fill){
-  x0 = x0+1;
-  x1 = x0+11;
-  y1 = y0+6;
-  display.oled.drawLine(x0, y0, x1, y0, 1, false); //top
-  display.oled.drawLine(x0, y1, x1, y1, 1, false); //bottom
-  display.oled.drawLine(x0, y0, x0, y1, 1, false); //left
-  display.oled.drawLine(x1, y0, x1, y1, 1, false); //right
-  display.oled.drawLine(x0-1, y0+2, x0-1, y1-2, 1, false); //iconify
-  if (fill >= 0){
-    var batt = Math.round(fill / 10);
-    display.oled.fillRect(x1-batt, y0+1, batt, 5, 1, false); //fill battery gauge
-  } else {
-    display.oled.drawLine(x0, y1, x1, y0, 1, false); //offline
+function drawReservoirIcon (display, x0, y0, fill){
+  // Print Battery first
+  var pixels = [
+    [x0+4, y0, 1],
+    [x0+5, y0, 1],
+    [x0+6, y0, 1],
+    [x0+7, y0, 1],
+    [x0+8, y0, 1],
+    [x0+9, y0, 1],
+    [x0+10, y0, 1],
+    [x0+11, y0, 1],
+    [x0+12, y0, 1],
+    [x0+13, y0, 1],
+    [x0+14, y0, 1],
+    //
+    [x0+3, y0+1, 1],
+    [x0+4, y0+1, 1],
+    [x0+14, y0+1, 1],
+    [x0+17, y0+1, 1],
+    //
+    [x0+2, y0+2, 1],
+    [x0+3, y0+2, 1],
+    [x0+14, y0+2, 1],
+    [x0+17, y0+2, 1],
+    //
+    [x0+1, y0+3, 1],
+    [x0+2, y0+3, 1],
+    [x0+14, y0+3, 1],
+    [x0+15, y0+3, 1],
+    [x0+16, y0+3, 1],
+    [x0+17, y0+3, 1],
+    //
+    [x0, y0+4, 1],
+    [x0+1, y0+4, 1],
+    [x0+14, y0+4, 1],
+    [x0+15, y0+4, 1],
+    [x0+16, y0+4, 1],
+    [x0+17, y0+4, 1],
+    //
+    [x0+1, y0+5, 1],
+    [x0+2, y0+5, 1],
+    [x0+14, y0+5, 1],
+    [x0+15, y0+5, 1],
+    [x0+16, y0+5, 1],
+    [x0+17, y0+5, 1],
+    //
+    [x0+2, y0+6, 1],
+    [x0+3, y0+6, 1],
+    [x0+14, y0+6, 1],
+    [x0+17, y0+6, 1],
+    //
+    [x0+3, y0+7, 1],
+    [x0+4, y0+7, 1],
+    [x0+14, y0+7, 1],
+    [x0+17, y0+7, 1],
+    //
+    [x0+4, y0+8, 1],
+    [x0+5, y0+8, 1],
+    [x0+6, y0+8, 1],
+    [x0+7, y0+8, 1],
+    [x0+8, y0+8, 1],
+    [x0+9, y0+8, 1],
+    [x0+10, y0+8, 1],
+    [x0+11, y0+8, 1],
+    [x0+12, y0+8, 1],
+    [x0+13, y0+8, 1],
+    [x0+14, y0+8, 1]
+  ];  
+  display.oled.drawPixel(pixels, false);
+  
+  // print fill level
+  if (fill >= 50){
+    display.oled.fillRect(x0+11, y0+2, 2, 5, 1, false);
+  }
+  if (fill >= 100){
+    display.oled.fillRect(x0+8, y0+2, 2, 5, 1, false);  
+  }
+  if (fill >= 230){
+    display.oled.fillRect(x0+5, y0+2, 2, 5, 1, false);
+  
+  }
+  
+  if (fill < 0){
+    display.oled.drawLine(x0+5, y0+1, x0+14, y0+7, 1, false);
   }
 }
 
+function drawBatteryIcon (display, x0, y0, fill){
+  // Print Battery first
+  var pixels = [
+    [x0+2, y0, 1],
+    [x0+3, y0, 1],
+    [x0+4, y0, 1],
+    [x0+5, y0, 1],
+    [x0+6, y0, 1],
+    [x0+7, y0, 1],
+    [x0+8, y0, 1],
+    [x0+9, y0, 1],
+    [x0+10, y0, 1],
+    [x0+11, y0, 1],
+    [x0+12, y0, 1],
+    [x0+13, y0, 1],
+    //
+    [x0+2, y0+1, 1],
+    [x0+13, y0+1, 1],
+    //
+    [x0, y0+2, 1],
+    [x0+1, y0+2, 1],
+    [x0+2, y0+2, 1],
+    [x0+13, y0+2, 1],
+    //
+    [x0, y0+3, 1],
+    [x0+2, y0+3, 1],
+    [x0+13, y0+3, 1],
+    //
+    [x0, y0+4, 1],
+    [x0+2, y0+4, 1],
+    [x0+13, y0+4, 1],
+    //
+    [x0, y0+5, 1],
+    [x0+2, y0+5, 1],
+    [x0+13, y0+5, 1],
+    //
+    [x0, y0+6, 1],
+    [x0+1, y0+6, 1],
+    [x0+2, y0+6, 1],
+    [x0+13, y0+6, 1],
+    //
+    [x0+2, y0+7, 1],
+    [x0+13, y0+7, 1],
+    //
+    [x0+2, y0+8, 1],
+    [x0+3, y0+8, 1],
+    [x0+4, y0+8, 1],
+    [x0+5, y0+8, 1],
+    [x0+6, y0+8, 1],
+    [x0+7, y0+8, 1],
+    [x0+8, y0+8, 1],
+    [x0+9, y0+8, 1],
+    [x0+10, y0+8, 1],
+    [x0+11, y0+8, 1],
+    [x0+12, y0+8, 1],
+    [x0+13, y0+8, 1]
+  ];  
+  display.oled.drawPixel(pixels, false);
+  
+  // print fill level
+  if (fill >= 20){
+    display.oled.fillRect(x0+10, y0+2, 2, 5, 1, false);
+  }
+  if (fill >= 50){
+    display.oled.fillRect(x0+7, y0+2, 2, 5, 1, false);  
+  }
+  if (fill >= 90){
+    display.oled.fillRect(x0+4, y0+2, 2, 5, 1, false);
+  
+  }
+  
+  if (fill < 0){
+    display.oled.drawLine(x0+3, y0+1, x0+12, y0+7, 1, false);
+  }
+}
+
+// deprecated but I don't want to delete it :D
 function drawConnectIcon (display, x0, y0, connected){
   x0 = x0+1;
   x1 = x0+11;
@@ -62,28 +209,54 @@ function drawConnectIcon (display, x0, y0, connected){
   }
 }
 
-function drawWiFiIcon (display, x0, y0, connected){
-  if (connected){
-    var pixels = [
-      [x0+1, y0, 1],
-      [x0+2, y0, 1],
-      [x0+3, y0, 1],
-      [x0+4, y0, 1],
-      [x0, y0+1, 1],
-      [x0+5, y0+1, 1],
-      [x0+2, y0+2, 1],
-      [x0+3, y0+2, 1],
-      [x0+1, y0+3, 1],
-      [x0+4, y0+3, 1],
-      [x0+2, y0+5, 1],
-      [x0+3, y0+5, 1]
-    ];
-  } else {
-    var pixels = [
-      [x0+2, y0+5, 1],
-      [x0+3, y0+5, 1]
-    ];
-  }
+function drawWiFiIcon (display, x0, y0){
+  var pixels = [
+    [x0+2, y0+1, 1],
+    [x0+3, y0+1, 1],
+    [x0+4, y0+1, 1],
+    [x0+5, y0+1, 1],
+    [x0+1, y0+2, 1],
+    [x0+6, y0+2, 1],
+    [x0, y0+3, 1],
+    [x0+7, y0+3, 1],
+    [x0+3, y0+4, 1],
+    [x0+4, y0+4, 1],
+    [x0+2, y0+5, 1],
+    [x0+5, y0+5, 1],
+    [x0+3, y0+7, 1],
+    [x0+4, y0+7, 1],
+    [x0+3, y0+8, 1],
+    [x0+4, y0+8, 1]    
+  ];
+  
+  display.oled.drawPixel(pixels, false);
+}
+
+function drawBTIcon (display, x0, y0){
+  var pixels = [
+    [x0+2, y0, 1],
+    [x0+3, y0, 1],
+    [x0+2, y0+1, 1],
+    [x0+4, y0+1, 1],
+    [x0, y0+2, 1],
+    [x0+2, y0+2, 1],
+    [x0+5, y0+2, 1],
+    [x0+1, y0+3, 1],
+    [x0+2, y0+3, 1],
+    [x0+4, y0+3, 1],
+    [x0+2, y0+4, 1],
+    [x0+3, y0+4, 1],
+    [x0+1, y0+5, 1],
+    [x0+2, y0+5, 1],
+    [x0+4, y0+5, 1],
+    [x0, y0+6, 1],
+    [x0+2, y0+6, 1],
+    [x0+5, y0+6, 1],
+    [x0+2, y0+7, 1],
+    [x0+4, y0+7, 1],
+    [x0+2, y0+8, 1],
+    [x0+3, y0+8, 1]
+  ];
   
   display.oled.drawPixel(pixels, false);
 }
@@ -166,39 +339,14 @@ try {
 } catch (e) {
     console.error("Status screen display error: could not find pump_loop_success");
 }
-
-
-// show current time
-var nowDate = new Date();
-var hour = nowDate.getHours();
-hour = (hour < 10 ? "0" : "") + hour;
-var min  = nowDate.getMinutes();
-min = (min < 10 ? "0" : "") + min;
-
-display.oled.setCursor(50,0);
-display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
-
-// show online connection icon if connected to wifi
 try {
-  let isOnline = execSync('ifconfig | grep wlan0 -A 1 | grep -q inet');
-  if (isOnline == 0){
-     drawWiFiIcon(display, 95, 0, true);
-  } else {
-     drawWiFiIcon(display, 95, 0, false);
-  }
+    var reservoir = JSON.parse(fs.readFileSync(openapsDir+"/monitor/reservoir.json"));
+    console.log(reservoir); 
 } catch (e) {
-  drawWiFiIcon(display, 95, 0, false);
+    console.error("Status screen display error: could not parse reservoir.json: ", e);
 }
 
-// show local battery level
-if(batterylevel) {
-  drawBatteryIcon(display, 116, 0 , batterylevel.battery);
-} else {
-  drawBatteryIcon(display, 116, 0 ,-1);
-}
-
-// show pump connect icon
-drawConnectIcon(display, 20, 0, true);
+// BEGIN Symbol Line (from left to right)
 
 // show pump battery level
 if(pumpBatterylevel && pumpBatterylevel.voltage) { 
@@ -212,6 +360,47 @@ if(pumpBatterylevel && pumpBatterylevel.voltage) {
 } else {
   drawBatteryIcon(display, 0, 0 ,-1);
 }
+
+// show pump reservoir icon
+if (reservoir){
+  drawReservoirIcon(display, 22, 0, reservoir);
+} else {
+  drawReservoirIcon(display, 22, 0, -1);
+}
+
+// show current time
+var nowDate = new Date();
+var hour = nowDate.getHours();
+hour = (hour < 10 ? "0" : "") + hour;
+var min  = nowDate.getMinutes();
+min = (min < 10 ? "0" : "") + min;
+
+display.oled.setCursor(50,1);
+display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
+
+// Bluetooth Icon (for Logger conneciton)
+drawBTIcon(display, 101, 0);
+
+// show online connection icon if connected to wifi
+try {
+  let isOnline = execSync('ifconfig | grep wlan0 -A 1 | grep -q inet');
+  if (isOnline == 0){
+     drawWiFiIcon(display, 86, 0);
+  } else {
+     //drawWiFiIcon(display, 88, 0, false);
+  }
+} catch (e) {
+  //drawWiFiIcon(display, 88, 0, false);
+}
+
+// show local battery level
+if(batterylevel) {
+  drawBatteryIcon(display, 113, 0 , batterylevel.battery);
+} else {
+  drawBatteryIcon(display, 113, 0 ,-1);
+}
+
+// END Symbol Line
 
 //calculate timeago for BG
 if(bg && profile) {
@@ -231,35 +420,31 @@ if(bg && profile) {
     }
 
     //display BG number, add plus sign if delta is positive 
-    display.oled.setCursor(0,11);
+    display.oled.setCursor(0,13);
     display.oled.writeString(font, 3, ""+convert_bg(bg[0].glucose, profile), 1, false, 0, false);
     var curPos = display.oled.cursor_x + 1 ;
     if (minutes >= 11 ){
-      display.oled.fillRect(0, 23, curPos, 3, 1, false);
+      display.oled.fillRect(0, 25, curPos, 3, 1, false);
     } else if (delta) {
       if (delta >= 5) {
-        drawArrowUp(display, curPos+3, 13);
+        drawArrowUp(display, curPos+3, 15);
       } else if ( delta <= -5){
-        drawArrowDown(display, 55, 13);
+        drawArrowDown(display, 55, 15);
       }
       if (delta >= 10) {
-        drawArrowUp(display, curPos+10, 13);
+        drawArrowUp(display, curPos+10, 15);
       } else if ( delta <= -10){
-        drawArrowDown(display, 65, 13);
+        drawArrowDown(display, 65, 15);
       }
     }
 }
 
 //parse and render COB/IOB
 if(iob) {
-  //var curPosIob = (iob[0].iob >= 1.0 ? 0 : 10);
-  //var curPosCob = (cob.mealCOB >= 1.0 ? 0 : 10);
-  
-  //var curStart = 0 + (iob[0].iob >= 10.0 ? 0 : 10) + (cob.mealCOB >= 10.0 ? 0 : 10);
-  display.oled.setCursor(85,11); //39
+  display.oled.setCursor(85,13); //39
   var iob = round(iob[0].iob, 1).toFixed(1);
   if (iob >= 10.0) {
-    display.oled.setCursor(95,11)
+    display.oled.setCursor(95,13);
     iob = round(iob);
   }
   display.oled.writeString(font, 2, iob+"U", 1, false, 0, false);
