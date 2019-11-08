@@ -1,7 +1,18 @@
+// scripts/text_status.js
+// Text based APS status screen 
+//
+// Author: juehv
+// License: AGPLv3
+
+/*jslint node: true */
+/*jslint esversion: 6 */
+
+'use strict';
+
 var fs = require('fs');
 var font = require('oled-font-5x7');
 var dns = require('dns');
-const {execSync} = require('child_process');
+//const {execSync} = require('child_process');
 
 // Rounds value to 'digits' decimal places
 function round(value, digits)
@@ -378,13 +389,15 @@ min = (min < 10 ? "0" : "") + min;
 display.oled.setCursor(50,1);
 display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
 
-// Bluetooth Icon (for Logger conneciton)
-drawBTIcon(display, 101, 0);
+// Bluetooth Icon (for Logger conneciton? or bt teathering?)
+// TODO implement
+// drawBTIcon(display, 101, 0);
 
 // show online connection icon if connected to wifi
+// TODO maybe split BT and WiFi later ...
 try {
-  let isOnline = execSync('ifconfig | grep wlan0 -A 1 | grep -q inet');
-  if (isOnline == 0){
+  //let isOnline = execSync('ifconfig | grep wlan0 -A 1 | grep -q inet');
+  if (fs.existsSync('/tmp/hasPublicIp')){
      drawWiFiIcon(display, 86, 0);
   } else {
      //drawWiFiIcon(display, 88, 0, false);
