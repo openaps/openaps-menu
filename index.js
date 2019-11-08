@@ -111,7 +111,86 @@ var menuConfig = {
     moreDownLabel: "  v v v"
   }
 };
-var hidMenu = require('./lib/hid-menu/hid-menu')(buttonsConfig, menuConfig);
+
+const Menube = require('menube');
+
+function createHIDMenu(configButtons, configMenus) {
+  if (!configButtons.gpios || !configButtons.gpios.buttonUp || !configButtons.gpios.buttonDown) {
+    throw new Error('Incomplete pins definition in configuration.');
+  }
+  var gpios = configButtons.gpios;
+  var menu = Menube(configMenus.menuFile, configMenus.menuSettings);
+  var displayDirty = false;
+  var piButtons = require('node-pi-buttons')(configButtons.options);
+
+  menu.on('menu_changed', function () {
+    displayDirty = false; // the parent will redraw the display
+  });
+
+  piButtons
+  .on('clicked', function (gpio, data) {
+  console.log("clicked");
+    if (displayDirty) {
+      // fake menu changed to force redraw
+      menu.emit('menu_changed');
+      displayDirty = false;
+    }
+    else {
+      switch(parseInt(gpio, 10)) {
+        case gpios.buttonUp:
+        if (!displayDirty) {
+          menu.menuUp();
+        }
+        break;
+
+        case gpios.buttonDown:
+        if (!displayDirty) {
+          menu.menuDown();
+        }
+        break;
+      }
+    }
+  })
+  .on('pressed', function (gpio, data) {
+  console.log("pressed");
+  })
+  .on('double_clicked', function (gpio, data) {
+  console.log("double");
+    if (displayDirty) {
+      // fake menu changed to force redraw
+      menu.emit('menu_changed');
+      displayDirty = false;
+    }
+    else {
+      switch (parseInt(gpio, 10)) {
+        case gpios.buttonUp:
+        menu.menuBack();
+        break;
+
+        case gpios.buttonDown:
+        displayDirty = true; // activate may write something to the display
+        menu.activateSelect();
+        break;
+      }
+    }
+  })
+  .on('released', function (gpio, data) {
+  console.log("released");
+    if (displayDirty) {
+      // fake menu changed to force redraw
+      menu.emit('menu_changed');
+      displayDirty = false;
+    }
+  })
+  .on('error', function (data) {
+    console.log('ERROR: ', data.error);
+  });
+
+  return menu;
+}
+
+const screens = [textStatus,graphStatus,textStatus];
+var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens);
 
 // configure menu events
 hidMenu
@@ -145,6 +224,9 @@ hidMenu
 })
 .on('menu_changed', function () {
   showMenu(hidMenu);
+})
+.on('clearScreen', function () {
+  display.clear();
 })
 .on('showoutput', function (err, stdout, stderr) {
   display.clear();
