@@ -27,7 +27,12 @@ function stripLeadingZero(value)
   return value.toString().replace( re, '$1');
 }
 
-module.exports = radiofruitStatus;
+module.exports = exportSystemStatus;
+
+function exportSystemStatus(display, openapsDir) {
+	display.clear();
+	display.oled.writeString(font, 3, "System", 1, false, 0, false);
+}
 
 //
 //Start of status display function

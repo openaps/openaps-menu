@@ -9,50 +9,86 @@
 
 'use strict';
 const Menube = require('menube');
+const font = require('oled-font-5x7');
 
-module.exports = function (configButtons, configMenus, display, openapsDir, screens) {
+module.exports = function (configButtons, configMenus, display, openapsDir, screens, subMenuFiles) {
 	if (!configButtons.gpios || !configButtons.gpios.buttonUp || !configButtons.gpios.buttonDown) {
 		throw new Error('Incomplete pins definition in configuration.');
 	}
 	const gpios = configButtons.gpios;
-	const menu = Menube(configMenus.menuFile, configMenus.menuSettings);
+	const events = require('events');
+	const emitter = new events.EventEmitter();
 	const piButtons = require('node-pi-buttons')(configButtons.options);
 	
 	var screensPos=-1;
+	var subMenus = [];
+	var subMenuActive = false;
 	var displayDirty = false;
+	
 	
 	// menu functions
 	function up () {
-		if (screensPos === -1){
-			screensPos = 0;
-		} else if (screensPos !== 0){
-			screensPos -= 1;
+		if (subMenuActive){
+			subMenus[screensPos].menuUp();
+			showMenu(subMenus[screensPos]);
+		} else {
+			if (screensPos === -1){
+				screensPos = 0;
+			} else if (screensPos !== 0){
+				screensPos -= 1;
+			}
+			redraw();
 		}
-		console.log(screensPos);
-		redraw();
-		//menu.menuUp();
 	}
 	function down () {
-		if (screensPos === -1){
-			screensPos = 0;
-		} else if (screensPos !== screens.length-1){
-			screensPos += 1;
+		if (subMenuActive){
+			subMenus[screensPos].menuDown();
+			showMenu(subMenus[screensPos]);
+		} else {
+			if (screensPos === -1){
+				screensPos = 0;
+			} else if (screensPos !== screens.length-1){
+				screensPos += 1;
+			}
+			redraw();
 		}
-		console.log(screensPos);
-		redraw();
-		//menu.menuDown();
 	}
 	function esc () {
-		if (screensPos === -1){
-			screensPos = 0;
+		if (subMenuActive){
+			if (subMenus[screensPos].menuBack()){
+				showMenu(subMenus[screensPos]);
+			} else {
+				subMenuActive = false;
+				redraw();
+			}
+		} else {
+			if (screensPos === -1){
+				screensPos = 0;
+			}
+			redraw();
 		}
-		// menu.menuBack();
 	}
 	function act () {
-		if (screensPos === -1){
-			screensPos = 0;
+		if (subMenuActive){
+			if (subMenus[screensPos].getCurrentSelect().command){
+				display.clear();
+				display.write("Please wait...");
+				subMenus[screensPos].activateSelect();
+			} else {
+				subMenus[screensPos].activateSelect();
+				showMenu(subMenus[screensPos]);
+			}
+		} else {
+			if (screensPos === -1){
+				screensPos = 0;
+			}
+			if (subMenus[screensPos] !== undefined){
+				showMenu(subMenus[screensPos]);
+				subMenuActive = true;
+			} else {	
+				redraw();
+			}
 		}
-		// menu.activateSelect();
 	}
 	
 	// button events
@@ -101,11 +137,11 @@ module.exports = function (configButtons, configMenus, display, openapsDir, scre
 		// }
 	})
 	.on('released', function (gpio, data) {
-		if (displayDirty) {
+		// if (displayDirty) {
 		  // fake menu changed to force redraw
-		  menu.emit('menu_changed');
-		  displayDirty = false;
-		}
+		  // emitter.emit('menu_changed');
+		  // displayDirty = false;
+		// }
 		resetTimer();
 	})
 	.on('error', function (data) {
@@ -119,10 +155,12 @@ module.exports = function (configButtons, configMenus, display, openapsDir, scre
 			clearTimeout(timer);
 		}
 
+		var timeout = subMenuActive ? 60000 : 15000;
 		timer = setTimeout(() => {
 			display.clear();
 			screensPos = -1;
-		}, 15000);
+			subMenuActive = false;
+		}, timeout);
 	}
 	
 	// draw active screen
@@ -132,5 +170,39 @@ module.exports = function (configButtons, configMenus, display, openapsDir, scre
 		}
 	}
 	
-	return menu;
+	// handling sub menus
+	
+	subMenuFiles.forEach(function (item) {
+		if (item !== undefined){
+			const tmpMenu = Menube(item, configMenus.menuSettings)
+			tmpMenu.on('showoutput', function (err, stdout, stderr) {
+				display.clear();
+				display.write(stdout);
+			});
+			subMenus.push(tmpMenu);
+		} else {
+			subMenus.push(undefined);
+		}
+	});
+	
+	function showMenu(menu) {
+		if (display) {
+			display.clear();
+			var text = '';
+
+			var p = menu.getParentSelect();
+			text += p ? '[' + p.label + ']\n' : '';
+			
+			var c = menu.getCurrentSelect();
+			menu.getActiveMenu().forEach(function (m) {
+				text += (m.selected ? '>' : ' ') + m.label + '\n';
+			});
+
+			//  console.log(text);
+			display.oled.writeString(font, 1, text, 1, false, 0, false);
+			// display.write(text);
+		}
+	}
+	
+	return emitter;
 }

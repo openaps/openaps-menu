@@ -89,9 +89,9 @@ socketServer
 
 // load up graphical status scripts
 const graphStatus = require('./scripts/status.js');
-const bigBGStatus = require('./scripts/big_bg_status.js');
-const textStatus = require('./scripts/text_status.js');
-const radiofruitStatus = require('./scripts/status-radiofruit.js');
+const targetStatus = require('./scripts/big_bg_status.js');
+const bgStatus = require('./scripts/text_status.js');
+const systemStatus = require('./scripts/status-radiofruit.js');
 // if you want to add your own status display script, it will be easiest to replace one of the above!
 
 // setup the menus
@@ -104,130 +104,131 @@ if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
 
 var menuConfig = {
   menuFile: process.cwd() + path.sep + './config/menus/menu.json', // file path for the menu definition
-  onChange: showMenu, // method to call when menu changes
   menuSettings: {
     displayLines: displayConfig.displayLines - 1, // one line is used for menu title
-    moreUpLabel: "  ^ ^ ^",
-    moreDownLabel: "  v v v"
+    moreUpLabel: " < < <",
+    moreDownLabel: " > > >"
   }
 };
 
-const Menube = require('menube');
+// const Menube = require('menube');
 
-function createHIDMenu(configButtons, configMenus) {
-  if (!configButtons.gpios || !configButtons.gpios.buttonUp || !configButtons.gpios.buttonDown) {
-    throw new Error('Incomplete pins definition in configuration.');
-  }
-  var gpios = configButtons.gpios;
-  var menu = Menube(configMenus.menuFile, configMenus.menuSettings);
-  var displayDirty = false;
-  var piButtons = require('node-pi-buttons')(configButtons.options);
+// function createHIDMenu(configButtons, configMenus) {
+  // if (!configButtons.gpios || !configButtons.gpios.buttonUp || !configButtons.gpios.buttonDown) {
+    // throw new Error('Incomplete pins definition in configuration.');
+  // }
+  // var gpios = configButtons.gpios;
+  // var menu = Menube(configMenus.menuFile, configMenus.menuSettings);
+  // var displayDirty = false;
+  // var piButtons = require('node-pi-buttons')(configButtons.options);
 
-  menu.on('menu_changed', function () {
-    displayDirty = false; // the parent will redraw the display
-  });
+  // menu.on('menu_changed', function () {
+    // displayDirty = false; // the parent will redraw the display
+  // });
 
-  piButtons
-  .on('clicked', function (gpio, data) {
-  console.log("clicked");
-    if (displayDirty) {
+  // piButtons
+  // .on('clicked', function (gpio, data) {
+  // console.log("clicked");
+    // if (displayDirty) {
       // fake menu changed to force redraw
-      menu.emit('menu_changed');
-      displayDirty = false;
-    }
-    else {
-      switch(parseInt(gpio, 10)) {
-        case gpios.buttonUp:
-        if (!displayDirty) {
-          menu.menuUp();
-        }
-        break;
+      // menu.emit('menu_changed');
+      // displayDirty = false;
+    // }
+    // else {
+      // switch(parseInt(gpio, 10)) {
+        // case gpios.buttonUp:
+        // if (!displayDirty) {
+          // menu.menuUp();
+        // }
+        // break;
 
-        case gpios.buttonDown:
-        if (!displayDirty) {
-          menu.menuDown();
-        }
-        break;
-      }
-    }
-  })
-  .on('pressed', function (gpio, data) {
-  console.log("pressed");
-  })
-  .on('double_clicked', function (gpio, data) {
-  console.log("double");
-    if (displayDirty) {
+        // case gpios.buttonDown:
+        // if (!displayDirty) {
+          // menu.menuDown();
+        // }
+        // break;
+      // }
+    // }
+  // })
+  // .on('pressed', function (gpio, data) {
+  // console.log("pressed");
+  // })
+  // .on('double_clicked', function (gpio, data) {
+  // console.log("double");
+    // if (displayDirty) {
       // fake menu changed to force redraw
-      menu.emit('menu_changed');
-      displayDirty = false;
-    }
-    else {
-      switch (parseInt(gpio, 10)) {
-        case gpios.buttonUp:
-        menu.menuBack();
-        break;
+      // menu.emit('menu_changed');
+      // displayDirty = false;
+    // }
+    // else {
+      // switch (parseInt(gpio, 10)) {
+        // case gpios.buttonUp:
+        // menu.menuBack();
+        // break;
 
-        case gpios.buttonDown:
-        displayDirty = true; // activate may write something to the display
-        menu.activateSelect();
-        break;
-      }
-    }
-  })
-  .on('released', function (gpio, data) {
-  console.log("released");
-    if (displayDirty) {
+        // case gpios.buttonDown:
+        // displayDirty = true; // activate may write something to the display
+        // menu.activateSelect();
+        // break;
+      // }
+    // }
+  // })
+  // .on('released', function (gpio, data) {
+  // console.log("released");
+    // if (displayDirty) {
       // fake menu changed to force redraw
-      menu.emit('menu_changed');
-      displayDirty = false;
-    }
-  })
-  .on('error', function (data) {
-    console.log('ERROR: ', data.error);
-  });
+      // menu.emit('menu_changed');
+      // displayDirty = false;
+    // }
+  // })
+  // .on('error', function (data) {
+    // console.log('ERROR: ', data.error);
+  // });
 
-  return menu;
-}
+  // return menu;
+// }
 
-const screens = [textStatus,graphStatus,textStatus];
-var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens);
+const screens = [bgStatus, targetStatus, graphStatus, systemStatus];
+const menuApsPath = process.cwd() + path.sep+ './scripts/menuAPS.json';
+const subMenus = [menuApsPath, menuApsPath, undefined, process.cwd() + path.sep+ './scripts/menuSystem.json'];
+var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens, subMenus);
 
 // configure menu events
 hidMenu
-.on('nothing', function () {
-})
-.on('showgraphstatus', function () {
-  graphStatus(display, openapsDir);
-})
-.on('showbigBGstatus', function () {
-  bigBGStatus(display, openapsDir);
-})
-.on('showRadiofruitStatus', function () {
-  radiofruitStatus(display, openapsDir);
-})
-.on('showlogo', function () {
- if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
-   displayImage('./static/unicorn_128x32.png');
- } else {
-   displayImage('./static/unicorn_128x64.png');
- }
-})
-.on('showvoltage', function () {
-  voltage()
-  .then(function (v) {
-    display.clear();
-    display.write('Voltage: ' + v);
-  })
-  .catch(function (e) {
-    console.log(e.toString());
-  });
-})
-.on('menu_changed', function () {
-  showMenu(hidMenu);
-})
-.on('clearScreen', function () {
-  display.clear();
-})
+// .on('nothing', function () {
+// })
+// .on('showgraphstatus', function () {
+  // graphStatus(display, openapsDir);
+// })
+// .on('showbigBGstatus', function () {
+  // bigBGStatus(display, openapsDir);
+// })
+// .on('showRadiofruitStatus', function () {
+  // radiofruitStatus(display, openapsDir);
+// })
+// .on('showlogo', function () {
+ // if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
+   // displayImage('./static/unicorn_128x32.png');
+ // } else {
+   // displayImage('./static/unicorn_128x64.png');
+ // }
+// })
+// .on('showvoltage', function () {
+  // voltage()
+  // .then(function (v) {
+    // display.clear();
+    // display.write('Voltage: ' + v);
+  // })
+  // .catch(function (e) {
+    // console.log(e.toString());
+  // });
+// })
+// .on('menu_changed', function () {
+  // showMenu(hidMenu);
+// })
+// .on('clearScreen', function () {
+  // display.clear();
+// })
 .on('showoutput', function (err, stdout, stderr) {
   display.clear();
   display.write(stdout);
@@ -235,19 +236,19 @@ hidMenu
 
 
 // display the current menu on the display
-function showMenu(menu) {
-  if (display) {
-    display.clear();
-    var text = '';
+// function showMenu(menu) {
+  // if (display) {
+    // display.clear();
+    // var text = '';
 
-    var p = menu.getParentSelect();
-    text += p ? '[' + p.label + ']\n' : '';
-    var c = menu.getCurrentSelect();
-    menu.getActiveMenu().forEach(function (m) {
-      text += (m.selected ? '>' : ' ') + m.label + '\n';
-    });
+    // var p = menu.getParentSelect();
+    // text += p ? '[' + p.label + ']\n' : '';
+    // var c = menu.getCurrentSelect();
+    // menu.getActiveMenu().forEach(function (m) {
+      // text += (m.selected ? '>' : ' ') + m.label + '\n';
+    // });
 
-    //  console.log(text);
-    display.write(text);
-  }
-}
+     // console.log(text);
+    // display.write(text);
+  // }
+// }
