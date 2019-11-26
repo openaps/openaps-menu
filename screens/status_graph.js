@@ -1,5 +1,5 @@
-// scripts/text_status.js
-// Text based APS status screen 
+// scripts/status_graph.js
+// Graph screen for cgm and bolus information  
 //
 // Author: juehv
 // License: AGPLv3
@@ -11,8 +11,6 @@
 
 var fs = require('fs');
 var font = require('oled-font-5x7');
-var dns = require('dns');
-//const {execSync} = require('child_process');
 
 // Rounds value to 'digits' decimal places
 function round(value, digits)
@@ -272,49 +270,17 @@ function drawBTIcon (display, x0, y0){
   display.oled.drawPixel(pixels, false);
 }
 
-function drawArrowUp (display, x0, y0){
-  height = 16;
-  
-  var i;
-  var max = 2;
-  for (i = 0; i <= max; i++) {
-    display.oled.drawLine(x0+max-i, y0+2*i, x0+max+1+i, y0+2*i, 1, false);
-    display.oled.drawLine(x0+max-i, y0+2*i+1, x0+max+1+i, y0+2*i+1, 1, false);
-  } 
-  display.oled.drawLine(x0+max, y0+2*max, x0+max, y0+height, 1, false); //line
-  display.oled.drawLine(x0+1+max, y0+2*max, x0+1+max, y0+height, 1, false); //line
-}
-
-function drawArrowDown (display, x0, y0){
-  height = 16;
-  y1 = y0+ height;
-  var i;
-  var max = 2;
-  for (i = max; i >= 0; i--) {
-    display.oled.drawLine(x0+max-i, y1-2*i, x0+max+1+i, y1-2*i, 1, false);
-    display.oled.drawLine(x0+max-i, y1-2*i-1, x0+max+1+i, y1-2*i-1, 1, false);
-  } 
-  display.oled.drawLine(x0+max, y0, x0+max, y0+height, 1, false); //line
-  display.oled.drawLine(x0+1+max, y0, x0+1+max, y0+height, 1, false); //line
-}
-
-module.exports = textStatus;
+module.exports = graphicalStatus;
 
 //
 //Start of status display function
 //
 
-function textStatus(display, openapsDir) {
+function graphicalStatus(display, openapsDir) {
 
-display.oled.clearDisplay(true); //clear the buffer
+display.oled.clearDisplay(true); //clear display buffer
 
 //Parse all the .json files we need
-try {
-    var profile = JSON.parse(fs.readFileSync(openapsDir+"/settings/profile.json"));
-} catch (e) {
-    // Note: profile.json is optional as it's only needed for mmol conversion for now. Print an error, but not return
-    console.error("Status screen display error: could not parse profile.json: ", e);
-}
 try {
     var batterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/edison-battery.json"));
 } catch (e) {
@@ -326,9 +292,44 @@ try {
     console.error("Status screen display error: could not parse battery.json: ", e);
 }
 try {
+    var reservoir = JSON.parse(fs.readFileSync(openapsDir+"/monitor/reservoir.json"));
+    console.log(reservoir); 
+} catch (e) {
+    console.error("Status screen display error: could not parse reservoir.json: ", e);
+}
+
+
+//########
+try {
+    var profile = JSON.parse(fs.readFileSync(openapsDir+"/settings/profile.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse profile.json: ", e);
+}
+try {
+    var batterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/edison-battery.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse edison-battery.json: ", e);
+}
+try {
+    var status = JSON.parse(fs.readFileSync(openapsDir+"/monitor/status.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse status.json: ", e);
+}
+try {
+    var suggested = JSON.parse(fs.readFileSync(openapsDir+"/enact/suggested.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse suggested.json: ", e);
+}
+try {
     var bg = JSON.parse(fs.readFileSync(openapsDir+"/monitor/glucose.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse glucose.json: ", e);
+}
+try {
+    var temp = JSON.parse(fs.readFileSync(openapsDir+"/monitor/last_temp_basal.json"));
+    var statusStats = fs.statSync(openapsDir+"/monitor/last_temp_basal.json");
+} catch (e) {
+    console.error("Status screen display error: could not parse last_temp_basal.json: ", e);
 }
 try {
     var iob = JSON.parse(fs.readFileSync(openapsDir+"/monitor/iob.json"));
@@ -341,20 +342,9 @@ try {
     console.error("Status screen display error: could not parse meal.json: ", e);
 }
 try {
-    var tmpBasal = JSON.parse(fs.readFileSync(openapsDir+"/monitor/temp_basal.json"));
+    var pumpbattery = JSON.parse(fs.readFileSync(openapsDir+"/monitor/battery.json"));
 } catch (e) {
-    console.error("Status screen display error: could not parse temp_basal.json");
-}
-try {
-    var stats = fs.statSync("/tmp/pump_loop_success");
-} catch (e) {
-    console.error("Status screen display error: could not find pump_loop_success");
-}
-try {
-    var reservoir = JSON.parse(fs.readFileSync(openapsDir+"/monitor/reservoir.json"));
-    console.log(reservoir); 
-} catch (e) {
-    console.error("Status screen display error: could not parse reservoir.json: ", e);
+    console.error("Status screen display error: could not parse battery.json: ", e);
 }
 
 // BEGIN Symbol Line (from left to right)
@@ -415,8 +405,90 @@ if(batterylevel) {
 
 // END Symbol Line
 
-//calculate timeago for BG
-if(bg && profile) {
+//Process and display battery gauge
+// if(batterylevel) {
+    // display.oled.drawLine(116, 57, 127, 57, 1, false); //top
+    // display.oled.drawLine(116, 63, 127, 63, 1, false); //bottom
+    // display.oled.drawLine(116, 57, 116, 63, 1, false); //left
+    // display.oled.drawLine(127, 57, 127, 63, 1, false); //right
+    // display.oled.drawLine(115, 59, 115, 61, 1, false); //make it look like a battery
+    // var batt = Math.round(batterylevel.battery / 10);
+    // display.oled.fillRect(127-batt, 58, batt, 5, 1, false); //fill battery gauge
+// }
+
+//display warning messages, and move the graph to make room for the message
+var yOffset = 0; //offset for graph, if we need to move it
+if (status && suggested && pumpbattery) {
+    var notLoopingReason = suggested.reason;
+    display.oled.setCursor(0,16);
+    if (pumpbattery.voltage <= 1.25) {
+        display.oled.writeString(font, 1, "LOW PUMP BATT.", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (status.suspended == true) {
+        display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (status.bolusing == true) {
+        display.oled.writeString(font, 1, "PUMP BOLUSING", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (notLoopingReason.includes("CGM is calibrating")) {
+        display.oled.writeString(font, 1, "CGM calib./???/noisy", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (notLoopingReason.includes("CGM data is unchanged")) {
+        display.oled.writeString(font, 1, "CGM data unchanged", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (notLoopingReason.includes("BG data is too old")) {
+        display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (notLoopingReason.includes("currenttemp rate")) {
+        display.oled.writeString(font, 1, "Temp. mismatch", 1, false, 0, false);
+        yOffset = 3;
+    }
+    else if (suggested.carbsReq) {
+        display.oled.writeString(font, 1, "Carbs Required: "+suggested.carbsReq+'g', 1, false, 0, false);
+        yOffset = 3;
+    }
+//add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
+}
+
+//display current target(s)
+if (profile) {
+    var targetLow = Math.round( (21+yOffset) - ( ( profile.bg_targets.targets[0].low - 250 ) / 8 ) );
+    var targetHigh = Math.round( (21+yOffset) - ( ( profile.bg_targets.targets[0].high - 250 ) / 8 ) );
+    display.oled.drawLine(2, targetHigh, 5, targetHigh, 1, false);
+    display.oled.drawLine(2, targetLow, 5, targetLow, 1, false);
+}
+
+if (bg) {
+    //render BG graph
+    var numBGs = ((suggested != undefined) && (suggested.predBGs != undefined)) ? (72) : (120); //fill the whole graph with BGs if there are no predictions    var date = new Date();
+    var date = new Date();
+    var zerotime = date.getTime() - ((numBGs * 5) * 600);
+    var zero_x = numBGs + 5;
+    for (var i = 0; i < numBGs; i++) {
+        if (bg[i] != null) {
+            var x = zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
+            var y = Math.round( (21+yOffset) - ( ( bg[i].glucose - 250 ) / 8 ) );
+            //left and right boundaries
+            if ( x < 5 ) x = 5;
+            if ( x > 127 ) x = 127;
+            //upper and lower boundaries
+            if ( y < (21+yOffset) ) y = (21+yOffset);
+            if ( y > (51+yOffset) ) y = (51+yOffset);
+            display.oled.drawPixel([x, y, 1, false]);
+            // if we have multiple data points within 3m, look further back to fill in the graph
+            if ( bg[i-1] && bg[i-1].date - bg[i].date < 200000 ) {
+                numBGs++;
+            }
+        }
+    }
+
+    //calculate timeago for BG
     var startDate = new Date(bg[0].date);
     var endDate = new Date();
     var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
@@ -431,63 +503,68 @@ if(bg && profile) {
     } else {
         var delta = 0;
     }
-
-    //display BG number, add plus sign if delta is positive 
-    display.oled.setCursor(0,13);
-    display.oled.writeString(font, 3, ""+convert_bg(bg[0].glucose, profile), 1, false, 0, false);
-    var curPos = display.oled.cursor_x + 1 ;
-    if (minutes >= 11 ){
-      display.oled.fillRect(0, 25, curPos, 3, 1, false);
-    } else if (delta) {
-      if (delta >= 5) {
-        drawArrowUp(display, curPos+3, 15);
-      } else if ( delta <= -5){
-        drawArrowDown(display, 55, 15);
-      }
-      if (delta >= 10) {
-        drawArrowUp(display, curPos+10, 15);
-      } else if ( delta <= -10){
-        drawArrowDown(display, 65, 15);
-      }
+    //display BG number and timeago, add plus sign if delta is positive
+    display.oled.setCursor(0,57);
+    if (delta >= 0) {
+        display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+"+"+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, false, 0, false);
+    } else {
+        display.oled.writeString(font, 1, "BG:"+convert_bg(bg[0].glucose, profile)+""+stripLeadingZero(convert_bg(delta, profile))+" "+minutes+"m", 1, false, 0, false);
     }
 }
 
-//parse and render COB/IOB
-if(iob) {
-  display.oled.setCursor(85,13); //39
-  var iob = round(iob[0].iob, 1).toFixed(1);
-  if (iob >= 10.0) {
-    display.oled.setCursor(95,13);
-    iob = round(iob);
-  }
-  display.oled.writeString(font, 2, iob+"U", 1, false, 0, false);
+//render predictions on the graph, but only if we have them
+if (bg && suggested && suggested.predBGs != undefined) {
+    //render line between actual BG and predicted
+    x = zero_x + 1;
+    display.oled.drawLine(x, 51+yOffset, x, 21+yOffset, 1, false);
+    //render predictions
+    var predictions = [suggested.predBGs.IOB, suggested.predBGs.ZT, suggested.predBGs.UAM, suggested.predBGs.COB];
+    for (i = 0; i <= 48; i++) {
+        x++;
+        for(var n = 0; n <=3 && (predictions[n] != undefined); n++) {
+        y = Math.round( (21+yOffset) - ( (predictions[n][i] - 250 ) / 8) );
+        //right boundary
+        if ( x > 127 ) x = 127;
+        //upper and lower boundaries
+        if ( y < (21+yOffset) ) y = (21+yOffset);
+        if ( y > (51+yOffset) ) y = (51+yOffset);
+        display.oled.drawPixel([x, y, 1, false]);
+        }
+    }
 }
 
-if(cob) {
-  display.oled.setCursor(0,37);
-  display.oled.writeString(font, 1, "COB: "+round(cob.mealCOB, 1).toFixed(1)+"g", 1, false, 0, false);
+//display current temp basal and how long ago it was set, on the first line of the screen
+if (statusStats && temp) {
+    startDate = new Date(statusStats.mtime);
+    endDate = new Date();
+    var minutesAgo = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
+    //display current temp basal
+    display.oled.setCursor(0,0);
+    var tempRate = Math.round(temp.rate*10)/10;
+    display.oled.writeString(font, 1, "TB: "+temp.duration+'m '+tempRate+'U/h '+'('+minutesAgo+'m ago)', 1, false, 0, false);
 }
 
-// show tmp basal info
-if(tmpBasal) {
-  display.oled.setCursor(0,47);
-  display.oled.writeString(font, 1, "tB : "+round(tmpBasal.rate,1).toFixed(1)+"U("+tmpBasal.duration+")", 1, false, 0, false);
-}
-//calculate timeago for last successful loop
-if(stats) {
-  var startDate = new Date(stats.mtime);
-  var endDate = new Date();
-  var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
-
-  //display last loop time
-  display.oled.setCursor(0,57);
-  display.oled.writeString(font, 1, "llp: "+minutes+"m ", 1, false, 0, false);
+//display current COB and IOB, on the second line of the screen
+if (iob && cob) {
+    display.oled.setCursor(0,8);
+    display.oled.writeString(font, 1, "COB: "+cob.mealCOB+"g  IOB: "+iob[0].iob+'U', 1, false, 0, false);
 }
 
+//display bg graph axes
+display.oled.drawLine(5, 51+yOffset, 5, 21+yOffset, 1, false);
+display.oled.drawLine(5, 51+yOffset, 127, 51+yOffset, 1, false);
+
+//render clock
+var clockDate = new Date();
+var clockHour = clockDate.getHours();
+clockHour = (clockHour < 10 ? "0" : "") + clockHour;
+var clockMin  = clockDate.getMinutes();
+clockMin = (clockMin < 10 ? "0" : "") + clockMin;
+display.oled.setCursor(83, 57);
+display.oled.writeString(font, 1, clockHour+":"+clockMin, 1, false, 0, false);
 
 display.oled.dimDisplay(true); //dim the display
-display.oled.update(); // write buffer to the screen
-
+display.oled.update(); //write buffer to the screen
 
 fs.readFile(openapsDir+"/preferences.json", function (err, data) {
   if (err) throw err;
@@ -495,10 +572,10 @@ fs.readFile(openapsDir+"/preferences.json", function (err, data) {
   if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("off")) {
     display.oled.invertDisplay(false);
   }
-  else if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("nightandday") && (hour >= 20 || hour <= 8)) {
+  else if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("nightandday") && (clockHour >= 20 || clockHour <= 8)) {
     display.oled.invertDisplay(false);
   }
-  else if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("nightandday") && (hour <= 20 && hour >= 8)) {
+  else if (preferences.wearOLEDevenly && preferences.wearOLEDevenly.includes("nightandday") && (clockHour <= 20 && clockHour >= 8)) {
     display.oled.invertDisplay(true);
   }
   else {
@@ -509,5 +586,3 @@ fs.readFile(openapsDir+"/preferences.json", function (err, data) {
  //
 }//End of status display function
  //
-
-

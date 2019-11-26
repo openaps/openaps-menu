@@ -204,5 +204,6 @@ module.exports = function (configButtons, configMenus, display, openapsDir, scre
 		}
 	}
 	
+  resetTimer(); 
 	return emitter;
 }
