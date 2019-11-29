@@ -41,57 +41,5 @@ try {
 }
 
 
-// setup screens
-// TODO add radiofruit
-if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "explorer-hat") {
-	var textStatus = require('../screens/status_text.js');
-	var graphStatus = require('../screens/status_graph.js');
-	var systemStatus = require('../screens/status_system.js');
-} else {
-	throw ("hardware type \"" + preferences.hardwaretype + "\" not supported! Exit.");
-}
 
-//textStatus(display, openapsDir)
-
-var batteryDrainedScreen = require('../screens/status_battery_drained.js');
-var shutdownInterval;
-var blinkInterval;
-var invert = false;
-var shutdownStarted = false;
-function setShutdownInterval(shutdownDate){
-	batteryDrainedScreen(display,shutdownDate);
-	
-	if (typeof shutdownInterval !== 'undefined'){
-		clearInterval(shutdownInterval);
-	}
-	if (typeof blinkInterval !== 'undefined'){
-		clearInterval(blinkInterval);
-	}
-	
-	blinkInterval = setInterval(() => {
-		invert = !invert;
-		display.oled.invertDisplay(invert);
-		display.oled.dimDisplay(true); 
-		display.oled.update();
-	}, 1000);
-
-	shutdownInterval = setInterval(() => {
-		batteryDrainedScreen(display,shutdownDate);
-		const { exec } = require('child_process');
-		exec('./scripts/getvoltage.sh');
-	}, 60000);
-}
-
-
-		if (!shutdownStarted){
-			// show warning to user	
-			const { exec } = require('child_process');
-			exec('service cron stop');		
-			exec('shutdown -P +10');
-			shutdownStarted = true;
-			
-			var shutdownDate = new Date(Date.now() + 10*60000); // in 10 minutes
-			setShutdownInterval(shutdownDate);
-		}
-
-//require('../screens/status_battery_drained.js')(display, openapsDir, new Date());
+require('../screens/status_graph.js')(display, openapsDir);

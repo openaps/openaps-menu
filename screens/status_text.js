@@ -13,7 +13,7 @@ var fs = require('fs');
 var font = require('oled-font-5x7');
 
 var round = require('../lib/utils/utils.js').round;
-var convertBg= require('../lib/utils/utils.js').convertBg
+var convertBg= require('../lib/utils/utils.js').convertBg;
 
 var drawReservoirIcon = require('../lib/utils/utils.js').drawReservoirIcon;
 var drawBatteryIcon = require('../lib/utils/utils.js').drawBatteryIcon;
@@ -22,122 +22,15 @@ var drawBTIcon = require('../lib/utils/utils.js').drawBTIcon;
 
 var drawArrowUp = require('../lib/utils/utils.js').drawArrowUp;
 var drawArrowDown = require('../lib/utils/utils.js').drawArrowDown;
+var drawLoopIcon = require('../lib/utils/utils.js').drawLoopIcon;
+var drawTargetIcon = require('../lib/utils/utils.js').drawTargetIcon;
 
-var statusBar = require('./status_bar.js');
-
-
-function drawLoopIcon (display, x0, y0, error){
-    var pixels = [
-      [x0+3, y0, 1],
-      [x0+2, y0+1, 1],
-      [x0+1, y0+2, 1],
-      [x0+2, y0+2, 1],
-      [x0+3, y0+2, 1],
-      [x0+4, y0+2, 1],
-      [x0+2, y0+3, 1],
-      [x0+5, y0+3, 1],
-      [x0+3, y0+4, 1],
-      [x0+6, y0+4, 1],
-      [x0, y0+5, 1],
-      [x0+6, y0+5, 1],
-      [x0, y0+6, 1],
-      [x0+6, y0+6, 1],
-      [x0+1, y0+7, 1],
-      [x0+5, y0+7, 1],
-      [x0+2, y0+8, 1],
-      [x0+3, y0+8, 1],
-      [x0+4, y0+8, 1]    
-    ];
-    
-    display.oled.drawPixel(pixels, false);
-	
-	if (error){
-		pixels = [
-		  [x0+10, y0, 1],
-		  [x0+11, y0, 1],
-		  [x0+10, y0+1, 1],
-		  [x0+11, y0+1, 1],
-		  [x0+10, y0+2, 1],
-		  [x0+11, y0+2, 1],
-		  [x0+10, y0+3, 1],
-		  [x0+11, y0+3, 1],
-		  [x0+10, y0+4, 1],
-		  [x0+11, y0+4, 1],
-		  [x0+10, y0+7, 1],
-		  [x0+11, y0+7, 1],
-		  [x0+10, y0+8, 1],
-		  [x0+11, y0+8, 1]
-		];
-		
-		display.oled.drawPixel(pixels, false);
-	}
-  }
-  
-  function drawDeltaIcon (display, x0, y0){
-    var pixels = [
-      [x0+2, y0+1, 1],
-      [x0+3, y0+1, 1],
-      [x0+4, y0+1, 1],
-      [x0+5, y0+1, 1],
-      [x0+1, y0+2, 1],
-      [x0+6, y0+2, 1],
-      [x0, y0+3, 1],
-      [x0+7, y0+3, 1],
-      [x0+3, y0+4, 1],
-      [x0+4, y0+4, 1],
-      [x0+2, y0+5, 1],
-      [x0+5, y0+5, 1],
-      [x0+3, y0+7, 1],
-      [x0+4, y0+7, 1],
-      [x0+3, y0+8, 1],
-      [x0+4, y0+8, 1]    
-    ];
-    
-    display.oled.drawPixel(pixels, false);
-  }
-  
-function drawTargetIcon (display, x0, y0){
-    var pixels = [
-      [x0+3, y0, 1],
-      [x0+3, y0+1, 1],
-      [x0+3, y0+2, 1],
-      
-	  [x0, y0+3, 1],
-      [x0+3, y0+3, 1],
-      [x0+6, y0+3, 1],
-      [x0+1, y0+4, 1],
-      [x0+3, y0+4, 1],
-      [x0+5, y0+4, 1],
-      [x0+2, y0+5, 1],
-      [x0+3, y0+5, 1],
-      [x0+4, y0+5, 1],
-      [x0+3, y0+6, 1],
-      [x0, y0+7, 1],
-      [x0+1, y0+7, 1],
-      [x0+2, y0+7, 1],
-      [x0+3, y0+7, 1],
-      [x0+4, y0+7, 1],
-      [x0+5, y0+7, 1],
-      [x0+6, y0+7, 1],
-      [x0, y0+8, 1],
-      [x0+1, y0+8, 1],
-      [x0+2, y0+8, 1],
-      [x0+3, y0+8, 1],
-      [x0+4, y0+8, 1],
-      [x0+5, y0+8, 1],
-      [x0+6, y0+8, 1]  
-    ];
-    
-    display.oled.drawPixel(pixels, false);
-  }
-
-
-module.exports = textStatus;
 
 //
 //Start of status display function
 //
 
+module.exports = textStatus;
 function textStatus(display, openapsDir) {
 //clear the buffer
 display.oled.clearDisplay(true);
@@ -246,6 +139,12 @@ try {
     console.error("Status screen display error: could not parse temp_basal.json");
 }
 try {
+	// TODO implement
+    var target = "110";
+} catch (e) {
+    console.error("Status screen display error: could not parse BG target file");
+}
+try {
     var stats = fs.statSync("/tmp/pump_loop_success");
 } catch (e) {
     console.error("Status screen display error: could not find pump_loop_success");
@@ -281,14 +180,14 @@ if(bg && profile) {
       display.oled.fillRect(0, 25, curPos, 3, 1, false);
     } else if (delta) {
       if (delta >= 5) {
-        drawArrowUp(display, curPos+3, 15);
+        drawArrowUp(display, curPos+3, 18);
       } else if ( delta <= -5){
-        drawArrowDown(display, 55, 15);
+        drawArrowDown(display, curPos+3, 18);
       }
       if (delta >= 10) {
-        drawArrowUp(display, curPos+10, 15);
+        drawArrowUp(display, curPos+10, 18);
       } else if ( delta <= -10){
-        drawArrowDown(display, 65, 15);
+        drawArrowDown(display, curPos+10, 18);
       }
     }
 }
@@ -315,15 +214,17 @@ if(cob) {
 }
 
 // display target
-drawTargetIcon(display,0,42);
-display.oled.setCursor(9,43);
-display.oled.writeString(font, 1, "110", 1, false, 0, false);
+if (target){
+	drawTargetIcon(display,0,42);
+	display.oled.setCursor(9,43);
+	display.oled.writeString(font, 1, target, 1, false, 0, false);
+}
 
 // show tmp basal info
-// if(tmpBasal) {
-  // display.oled.setCursor(0,47);
-  // display.oled.writeString(font, 1, "tB : "+round(tmpBasal.rate,1).toFixed(1)+"U("+tmpBasal.duration+")", 1, false, 0, false);
-// }
+if(tmpBasal) {
+  display.oled.setCursor(0,55);
+  display.oled.writeString(font, 1, "tB "+round(tmpBasal.rate,1).toFixed(1)+"U("+tmpBasal.duration+")", 1, false, 0, false);
+}
 
 //calculate timeago for last successful loop
 if(stats) {
@@ -332,12 +233,16 @@ if(stats) {
   var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 
   //display last loop time
-  display.oled.setCursor(0,57);
-  display.oled.writeString(font, 1, "llp: "+minutes+"m ", 1, false, 0, false);
+  if (minutes > 9){
+	drawLoopIcon(display,95,44,true);
+  } else{
+	drawLoopIcon(display,95,44,false);
+	display.oled.setCursor(116,47);
+	display.oled.writeString(font, 2, ''+minutes, 1, false, 0, false);
+  }
+} else {
+  drawLoopIcon(display,95,44,true);
 }
-
-drawLoopIcon(display,80,47,true);
-
 
 display.oled.dimDisplay(true); //dim the display
 display.oled.update(); // write buffer to the screenkil

@@ -1,5 +1,5 @@
 // scripts/status_text.js
-// Text based APS status screen 
+// Status screen for drained battery
 //
 // Author: juehv
 // License: AGPLv3
@@ -63,23 +63,24 @@ function drawBatteryDrainedIcon (display, x0, y0){
 
 }
 
-module.exports = function (display, shutdownDate){
+module.exports = function (display){
   display.clear();
 
   drawBatteryDrainedIcon(display, 45, 5);
   
   // show time when shutting down
   //var shutdownDate = new Date();
-  var hour = shutdownDate.getHours();
-  hour = (hour < 10 ? "0" : "") + hour;
-  var min  = shutdownDate.getMinutes();
-  min = (min < 10 ? "0" : "") + min;
+  // var hour = shutdownDate.getHours();
+  // hour = (hour < 10 ? "0" : "") + hour;
+  // var min  = shutdownDate.getMinutes();
+  // min = (min < 10 ? "0" : "") + min;
   display.oled.setCursor(1,35);
-  display.oled.writeString(font, 1, "The rig will shut down", 1, false, 0, false);
+  display.oled.writeString(font, 1, "The rig will shut", 1, false, 0, false);
   display.oled.setCursor(1,45);
-  display.oled.writeString(font, 1, "at "+hour+":"+min+" due to a low", 1, false, 0, false);
+  // display.oled.writeString(font, 1, "at "+hour+":"+min+" due to a low", 1, false, 0, false);
+  display.oled.writeString(font, 1, "down soon due to", 1, false, 0, false);
   display.oled.setCursor(1,55);
-  display.oled.writeString(font, 1, "battery. ", 1, false, 0, false);
+  display.oled.writeString(font, 1, "the low battery. ", 1, false, 0, false);
   
   
   display.oled.dimDisplay(true); //dim the display

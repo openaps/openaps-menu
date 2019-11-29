@@ -9,7 +9,7 @@
 		},
 		{
 			"label": "Eating Soon: 60m@80",
-			"command": "echo 'Please wait' && cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
+			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
 			"emit": "showoutput"
 		},
 		{

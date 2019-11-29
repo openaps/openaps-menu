@@ -60,7 +60,7 @@ const menuConfig = {
 };
 
 
-// setup screens
+// setup menu screens
 // TODO add radiofruit
 if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "explorer-hat") {
 	var textStatus = require('./screens/status_text.js');
@@ -81,51 +81,18 @@ var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, dis
 
 // configure menu events
 hidMenu
-// .on('nothing', function () {
-// })
-// .on('showgraphstatus', function () {
-  // graphStatus(display, openapsDir);
-// })
-// .on('showbigBGstatus', function () {
-  // bigBGStatus(display, openapsDir);
-// })
-// .on('showRadiofruitStatus', function () {
-  // radiofruitStatus(display, openapsDir);
-// })
-// .on('showlogo', function () {
- // if (preferences.hardwaretype && preferences.hardwaretype == "radiofruit") {
-   // displayImage('./static/unicorn_128x32.png');
- // } else {
-   // displayImage('./static/unicorn_128x64.png');
- // }
-// })
-// .on('showvoltage', function () {
-  // voltage()
-  // .then(function (v) {
-    // display.clear();
-    // display.write('Voltage: ' + v);
-  // })
-  // .catch(function (e) {
-    // console.log(e.toString());
-  // });
-// })
-// .on('menu_changed', function () {
-  // showMenu(hidMenu);
-// })
-// .on('clearScreen', function () {
-  // display.clear();
-// })
 .on('showoutput', function (err, stdout, stderr) {
   display.clear();
   display.write(stdout);
 });
 
+// setup battery drained mode
 var shutdownInterval;
 var blinkInterval;
 var invert = false;
 var shutdownStarted = false;
 function setShutdownInterval(shutdownDate){
-	batteryDrainedScreen(display,shutdownDate);
+	batteryDrainedScreen(display);
 	
 	if (typeof shutdownInterval !== 'undefined'){
 		clearInterval(shutdownInterval);
@@ -142,7 +109,7 @@ function setShutdownInterval(shutdownDate){
 	}, 1000);
 
 	shutdownInterval = setInterval(() => {
-		batteryDrainedScreen(display,shutdownDate);
+		batteryDrainedScreen(display);
 		const { exec } = require('child_process');
 		exec('./scripts/getvoltage.sh');
 	}, 60000);
@@ -165,13 +132,13 @@ socketServer
   console.log('socket-server warning: ', warn.reason)
 })
 .on('voltage_update', (response) => {
-	// start shutdown sequence at 2% battery
-	if (response.battery <= 2){
+	// show battery warning to user at 5% battery
+	if (response.battery <= 5){
 		if (!shutdownStarted){
 			// show warning to user	
-			const { exec } = require('child_process');
-			exec('service cron stop');		
-			exec('shutdown -P +10');
+			// const { exec } = require('child_process');
+			// exec('service cron stop');		
+			// exec('shutdown -P +10');
 			shutdownStarted = true;
 			
 			var shutdownDate = new Date(Date.now() + 10*60000); // in 10 minutes
