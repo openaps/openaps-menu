@@ -22,6 +22,7 @@ var drawBatteryIcon = require('../lib/utils/utils.js').drawBatteryIcon;
 var drawWiFiIcon = require('../lib/utils/utils.js').drawWiFiIcon;
 var drawBTIcon = require('../lib/utils/utils.js').drawBTIcon;
 
+const execSync = require('child_process').execSync;
 
 //
 //Start of status display function
@@ -110,6 +111,111 @@ if(batterylevel) {
 //
 // BEGIN System Status
 //
+try {
+	var hostname = execSync('echo $(hostname)').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute hostname: ", e);
+}
+try {
+	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d\  -f 7 | cut -d/ -f 1').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute wifiIp: ", e);
+}
+try {
+	var wifiName = execSync('iwgetid -r').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute wifiName: ", e);
+}
+try {
+	var btIp = execSync('ip -f inet -o addr show bnep0|cut -d\  -f 7 | cut -d/ -f 1').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute btIp: ", e);
+}
+try {
+	var publicIp = fs.readFileSync('/tmp/hasPublicIp');
+} catch (e) {
+	console.error("Status screen display error: could not parse /tmp/hasPublicIp: ", e);
+}
+try {
+    var status = JSON.parse(fs.readFileSync(openapsDir+"/monitor/status.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse status.json: ", e);
+}
+try {
+    var suggested = JSON.parse(fs.readFileSync(openapsDir+"/enact/suggested.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse suggested.json: ", e);
+}
+
+var yOffset = 16;
+const lineSize = 10;
+// show loop related status problems
+if (status && suggested) {
+    var notLoopingReason = suggested.reason;
+    display.oled.setCursor(0,yOffset);
+    if (status.suspended == true) {
+        display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, false, 0, false);
+        yOffset += lineSize;
+    }
+    else if (notLoopingReason.includes("CGM is calibrating")) {
+        display.oled.writeString(font, 1, "CGM calib./???/noisy", 1, false, 0, false);
+        yOffset += lineSize;
+    }
+    else if (notLoopingReason.includes("CGM data is unchanged")) {
+        display.oled.writeString(font, 1, "CGM data unchanged", 1, false, 0, false);
+        yOffset += lineSize;
+    }
+    else if (notLoopingReason.includes("BG data is too old")) {
+        display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
+        yOffset += lineSize;
+    }
+    else if (notLoopingReason.includes("currenttemp rate")) {
+        display.oled.writeString(font, 1, "Temp. mismatch", 1, false, 0, false);
+        yOffset += lineSize;
+    }
+    else if (suggested.carbsReq) {
+        display.oled.writeString(font, 1, "Carbs Required: "+suggested.carbsReq+'g', 1, false, 0, false);
+        yOffset += lineSize;
+    } 
+	
+	else {
+		display.oled.writeString(font, 1, "no error ", 1, false, 0, false);
+	}
+//add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
+}
+
+if (hostname){
+    display.oled.setCursor(0,yOffset);
+	display.oled.writeString(font, 1, "HN:"+hostname, 1, false, 0, false);
+	yOffset += lineSize;
+}
+
+if (wifiName){
+	drawWiFiIcon(display,0,yOffset);
+    display.oled.setCursor(4,yOffset);
+	display.oled.writeString(font, 1, wifiName, 1, false, 0, false);
+	yOffset += lineSize;
+}
+
+if (wifiIp){
+	drawWiFiIcon(display,0,yOffset);
+    display.oled.setCursor(4,yOffset);
+	display.oled.writeString(font, 1, wifiIp, 1, false, 0, false);
+	yOffset += lineSize;
+}
+
+if (btIp){
+	drawBTIcon(display,0,yOffset);
+    display.oled.setCursor(4,yOffset);
+	display.oled.writeString(font, 1, wifiIp, 1, false, 0, false);
+	yOffset += lineSize;
+}
+
+if (publicIp){
+    display.oled.setCursor(0,yOffset);
+	display.oled.writeString(font, 1, "pIP:"+publicIp, 1, false, 0, false);
+	yOffset += lineSize;
+}
 
  //
 }//End of status display function
