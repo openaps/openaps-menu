@@ -21,7 +21,7 @@ var drawReservoirIcon = require('../lib/utils/utils.js').drawReservoirIcon;
 var drawBatteryIcon = require('../lib/utils/utils.js').drawBatteryIcon;
 var drawWiFiIcon = require('../lib/utils/utils.js').drawWiFiIcon;
 var drawBTIcon = require('../lib/utils/utils.js').drawBTIcon;
-
+var drawConnectIcon = require('../lib/utils/utils.js').drawConnectIcon;
 const execSync = require('child_process').execSync;
 
 //
@@ -48,9 +48,20 @@ try {
     console.error("Status screen display error: could not parse reservoir.json: ", e);
 }
 try{
-	var publicIp = fs.existsSync('/tmp/hasPublicIp')
+	var hasPublicIp = fs.existsSync('/tmp/hasPublicIp');
 } catch (e) {
-	
+	// not online
+  console.log('No "/tmp/hasPublicIp" found. Not online?');
+}
+try {
+	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute wifiIp: ", e);
+}
+try {
+	var btIp = execSync('ip -f inet -o addr show bnep0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute btIp: ", e);
 }
 try {
     var batterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/edison-battery.json"));
@@ -88,15 +99,21 @@ min = (min < 10 ? "0" : "") + min;
 display.oled.setCursor(50,1);
 display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
 
-// Bluetooth Icon (for Logger conneciton? or bt teathering?)
-// TODO implement
-// drawBTIcon(display, 101, 0);
 
-// show online connection icon if connected to wifi
-// TODO maybe split BT and WiFi later ...
-if (publicIp){
-  drawWiFiIcon(display, 86, 0);
-} 
+// show online connection icon if connected to the Internet
+// TODO or WiFi AP icon if AP mode active
+if (hasPublicIp){
+  drawConnectIcon(display, 82, 1, true);
+} else {
+  drawConnectIcon(display, 82, 1, false);
+}
+
+// show WiFi icon if connected to a Wifi network or Bluetooth icon if connected to a PAN
+if (wifiIp){
+  drawWiFiIcon(display, 98, 0);
+} else if (btIp){
+  drawBTIcon(display, 99, 0);
+}
 
 // show local battery level
 if(batterylevel) {
@@ -112,14 +129,9 @@ if(batterylevel) {
 // BEGIN System Status
 //
 try {
-	var hostname = execSync('echo $(hostname)').toString();
+	var hostname = execSync('echo $(hostname)').toString().trim();
 } catch (e){
 	console.error("Status screen display error: could not execute hostname: ", e);
-}
-try {
-	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d\  -f 7 | cut -d/ -f 1').toString();
-} catch (e){
-	console.error("Status screen display error: could not execute wifiIp: ", e);
 }
 try {
 	var wifiName = execSync('iwgetid -r').toString();
@@ -127,12 +139,8 @@ try {
 	console.error("Status screen display error: could not execute wifiName: ", e);
 }
 try {
-	var btIp = execSync('ip -f inet -o addr show bnep0|cut -d\  -f 7 | cut -d/ -f 1').toString();
-} catch (e){
-	console.error("Status screen display error: could not execute btIp: ", e);
-}
-try {
-	var publicIp = fs.readFileSync('/tmp/hasPublicIp');
+  if (hasPublicIp) 
+	  var publicIp = fs.readFileSync('/tmp/hasPublicIp');
 } catch (e) {
 	console.error("Status screen display error: could not parse /tmp/hasPublicIp: ", e);
 }
@@ -186,20 +194,26 @@ if (status && suggested) {
 
 if (hostname){
     display.oled.setCursor(0,yOffset);
-	display.oled.writeString(font, 1, "HN:"+hostname, 1, false, 0, false);
+	display.oled.writeString(font, 1, "/> "+hostname, 1, false, 0, false);
 	yOffset += lineSize;
 }
 
 if (wifiName){
-	drawWiFiIcon(display,0,yOffset);
-    display.oled.setCursor(4,yOffset);
+  if (wifiIp){
+	  drawWiFiIcon(display,0,yOffset+4);
+  } else {
+	  drawWiFiIcon(display,0,yOffset-1);
+  }
+  display.oled.setCursor(12,yOffset);
 	display.oled.writeString(font, 1, wifiName, 1, false, 0, false);
 	yOffset += lineSize;
 }
 
 if (wifiIp){
-	drawWiFiIcon(display,0,yOffset);
-    display.oled.setCursor(4,yOffset);
+	if (!wifiName){
+    drawWiFiIcon(display,0,yOffset-1);
+  }
+  display.oled.setCursor(12,yOffset);
 	display.oled.writeString(font, 1, wifiIp, 1, false, 0, false);
 	yOffset += lineSize;
 }
@@ -216,6 +230,12 @@ if (publicIp){
 	display.oled.writeString(font, 1, "pIP:"+publicIp, 1, false, 0, false);
 	yOffset += lineSize;
 }
+
+
+//dim the display
+display.oled.dimDisplay(true); 
+//write buffer to the screen
+display.oled.update(); 
 
  //
 }//End of status display function

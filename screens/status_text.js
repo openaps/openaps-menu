@@ -19,11 +19,13 @@ var drawReservoirIcon = require('../lib/utils/utils.js').drawReservoirIcon;
 var drawBatteryIcon = require('../lib/utils/utils.js').drawBatteryIcon;
 var drawWiFiIcon = require('../lib/utils/utils.js').drawWiFiIcon;
 var drawBTIcon = require('../lib/utils/utils.js').drawBTIcon;
+var drawConnectIcon = require('../lib/utils/utils.js').drawConnectIcon;
 
 var drawArrowUp = require('../lib/utils/utils.js').drawArrowUp;
 var drawArrowDown = require('../lib/utils/utils.js').drawArrowDown;
 var drawLoopIcon = require('../lib/utils/utils.js').drawLoopIcon;
 var drawTargetIcon = require('../lib/utils/utils.js').drawTargetIcon;
+const execSync = require('child_process').execSync;
 
 
 //
@@ -49,9 +51,20 @@ try {
     console.error("Status screen display error: could not parse reservoir.json: ", e);
 }
 try{
-	var publicIp = fs.existsSync('/tmp/hasPublicIp')
+	var hasPublicIp = fs.existsSync('/tmp/hasPublicIp');
 } catch (e) {
-	
+	// not online
+  console.log('No "/tmp/hasPublicIp" found. Not online?');
+}
+try {
+	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute wifiIp: ", e);
+}
+try {
+	var btIp = execSync('ip -f inet -o addr show bnep0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
+} catch (e){
+	console.error("Status screen display error: could not execute btIp: ", e);
 }
 try {
     var batterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/edison-battery.json"));
@@ -89,15 +102,21 @@ min = (min < 10 ? "0" : "") + min;
 display.oled.setCursor(50,1);
 display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
 
-// Bluetooth Icon (for Logger conneciton? or bt teathering?)
-// TODO implement
-// drawBTIcon(display, 101, 0);
 
-// show online connection icon if connected to wifi
-// TODO maybe split BT and WiFi later ...
-if (publicIp){
-  drawWiFiIcon(display, 86, 0);
-} 
+// show online connection icon if connected to the Internet
+// TODO or WiFi AP icon if AP mode active
+if (hasPublicIp){
+  drawConnectIcon(display, 82, 1, true);
+} else {
+  drawConnectIcon(display, 82, 1, false);
+}
+
+// show WiFi icon if connected to a Wifi network or Bluetooth icon if connected to a PAN
+if (wifiIp){
+  drawWiFiIcon(display, 98, 0);
+} else if (btIp){
+  drawBTIcon(display, 99, 0);
+}
 
 // show local battery level
 if(batterylevel) {
@@ -137,12 +156,6 @@ try {
     var tmpBasal = JSON.parse(fs.readFileSync(openapsDir+"/monitor/temp_basal.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse temp_basal.json");
-}
-try {
-	// TODO implement
-    var target = "110";
-} catch (e) {
-    console.error("Status screen display error: could not parse BG target file");
 }
 try {
     var stats = fs.statSync("/tmp/pump_loop_success");
@@ -214,10 +227,10 @@ if(cob) {
 }
 
 // display target
-if (target){
+if (profile && profile.min_bg){
 	drawTargetIcon(display,0,42);
 	display.oled.setCursor(9,43);
-	display.oled.writeString(font, 1, target, 1, false, 0, false);
+	display.oled.writeString(font, 1, profile.min_bg.toString() , 1, false, 0, false);
 }
 
 // show tmp basal info
@@ -244,8 +257,10 @@ if(stats) {
   drawLoopIcon(display,95,44,true);
 }
 
-display.oled.dimDisplay(true); //dim the display
-display.oled.update(); // write buffer to the screenkil
+//dim the display
+display.oled.dimDisplay(true); 
+//write buffer to the screen
+display.oled.update(); 
 
  //
 }//End of status display function

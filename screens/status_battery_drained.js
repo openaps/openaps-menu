@@ -83,6 +83,8 @@ module.exports = function (display){
   display.oled.writeString(font, 1, "the low battery. ", 1, false, 0, false);
   
   
-  display.oled.dimDisplay(true); //dim the display
-  display.oled.update(); // write buffer to the screenkil
+  //dim the display
+  display.oled.dimDisplay(true); 
+  //write buffer to the screen
+  display.oled.update(); 
 }

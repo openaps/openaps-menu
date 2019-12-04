@@ -42,4 +42,4 @@ try {
 
 
 
-require('../screens/status_system.js')(display, openapsDir);
+require('../screens/status_graph.js')(display, openapsDir);
