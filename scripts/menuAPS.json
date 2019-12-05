@@ -9,17 +9,17 @@
 		},
 		{
 			"label": "Eating Soon: 60m@80",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
+			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ && oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
 			"emit": "showoutput"
 		},
 		{
 			"label": "Walking: 45m@120",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 120 45 | head -1 | jq . | fold -w 23 -s | head -8",
+			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ && oref0-append-local-temptarget 120 45 | head -1 | jq . | fold -w 23 -s | head -8",
 			"emit": "showoutput"
 		},
 		{
 			"label": "Running: 3h@140",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 140 180 | head -1 | jq . | fold -w 23 -s | head -8",
+			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ && oref0-append-local-temptarget 140 180 | head -1 | jq . | fold -w 23 -s | head -8",
 			"emit": "showoutput"
 		}
 	]

@@ -28,6 +28,15 @@ const execSync = require('child_process').execSync;
 //Start of status display function
 //
 
+// wipe bottom line for error messages if already written
+function wipeIfAlreadyUsed(yOffset){
+  if (yOffset >= 56){
+    yOffset = 56;
+    display.oled.fillRect(0, yOffset, 128, 10,  0, false);  
+  }
+  display.oled.setCursor(0,yOffset);
+}
+
 module.exports = systemStatus;
 function systemStatus(display, openapsDir) {
 
@@ -54,12 +63,12 @@ try{
   console.log('No "/tmp/hasPublicIp" found. Not online?');
 }
 try {
-	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
+	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d " " -f 7 |cut -d "/" -f 1').toString().trim();
 } catch (e){
 	console.error("Status screen display error: could not execute wifiIp: ", e);
 }
 try {
-	var btIp = execSync('ip -f inet -o addr show bnep0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
+	var btIp = execSync('ip -f inet -o addr show bnep0|cut -d " " -f 7 |cut -d "/" -f 1').toString().trim();
 } catch (e){
 	console.error("Status screen display error: could not execute btIp: ", e);
 }
@@ -134,13 +143,13 @@ try {
 	console.error("Status screen display error: could not execute hostname: ", e);
 }
 try {
-	var wifiName = execSync('iwgetid -r').toString();
+	var wifiName = execSync('iwgetid -r').toString().trim();
 } catch (e){
 	console.error("Status screen display error: could not execute wifiName: ", e);
 }
 try {
   if (hasPublicIp) 
-	  var publicIp = fs.readFileSync('/tmp/hasPublicIp');
+	  var publicIp = fs.readFileSync('/tmp/hasPublicIp').toString().trim();
 } catch (e) {
 	console.error("Status screen display error: could not parse /tmp/hasPublicIp: ", e);
 }
@@ -154,47 +163,34 @@ try {
 } catch (e) {
     console.error("Status screen display error: could not parse suggested.json: ", e);
 }
+try {
+	var usbIp = execSync('ip -f inet -o addr show usb0|cut -d " " -f 7 |cut -d "/" -f 1').toString().trim();
+} catch (e){
+	console.error("Status screen display error: could not execute wifiIp: ", e);
+}
 
 var yOffset = 16;
 const lineSize = 10;
-// show loop related status problems
-if (status && suggested) {
-    var notLoopingReason = suggested.reason;
-    display.oled.setCursor(0,yOffset);
-    if (status.suspended == true) {
-        display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, false, 0, false);
-        yOffset += lineSize;
-    }
-    else if (notLoopingReason.includes("CGM is calibrating")) {
-        display.oled.writeString(font, 1, "CGM calib./???/noisy", 1, false, 0, false);
-        yOffset += lineSize;
-    }
-    else if (notLoopingReason.includes("CGM data is unchanged")) {
-        display.oled.writeString(font, 1, "CGM data unchanged", 1, false, 0, false);
-        yOffset += lineSize;
-    }
-    else if (notLoopingReason.includes("BG data is too old")) {
-        display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
-        yOffset += lineSize;
-    }
-    else if (notLoopingReason.includes("currenttemp rate")) {
-        display.oled.writeString(font, 1, "Temp. mismatch", 1, false, 0, false);
-        yOffset += lineSize;
-    }
-    else if (suggested.carbsReq) {
-        display.oled.writeString(font, 1, "Carbs Required: "+suggested.carbsReq+'g', 1, false, 0, false);
-        yOffset += lineSize;
-    } 
-	
-	else {
-		display.oled.writeString(font, 1, "no error ", 1, false, 0, false);
-	}
-//add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
-}
 
+/*
 if (hostname){
     display.oled.setCursor(0,yOffset);
 	display.oled.writeString(font, 1, "/> "+hostname, 1, false, 0, false);
+	yOffset += lineSize;
+}
+*/
+
+if (usbIp){
+  if (hostname){
+    drawConnectIcon(display, 0,yOffset+5, true);
+    display.oled.setCursor(13,yOffset);
+    display.oled.writeString(font, 1, hostname+'.local', 1, false, 0, false);
+    yOffset += lineSize;
+  } else {
+    drawConnectIcon(display, 0,yOffset, true);
+  }
+  display.oled.setCursor(13,yOffset);
+	display.oled.writeString(font, 1, usbIp, 1, false, 0, false);
 	yOffset += lineSize;
 }
 
@@ -204,7 +200,7 @@ if (wifiName){
   } else {
 	  drawWiFiIcon(display,0,yOffset-1);
   }
-  display.oled.setCursor(12,yOffset);
+  display.oled.setCursor(13,yOffset);
 	display.oled.writeString(font, 1, wifiName, 1, false, 0, false);
 	yOffset += lineSize;
 }
@@ -213,24 +209,57 @@ if (wifiIp){
 	if (!wifiName){
     drawWiFiIcon(display,0,yOffset-1);
   }
-  display.oled.setCursor(12,yOffset);
+  display.oled.setCursor(13,yOffset);
 	display.oled.writeString(font, 1, wifiIp, 1, false, 0, false);
 	yOffset += lineSize;
 }
 
+// wifi AP mode
+
 if (btIp){
 	drawBTIcon(display,0,yOffset);
-    display.oled.setCursor(4,yOffset);
+  display.oled.setCursor(13,yOffset);
 	display.oled.writeString(font, 1, wifiIp, 1, false, 0, false);
 	yOffset += lineSize;
 }
 
 if (publicIp){
-    display.oled.setCursor(0,yOffset);
-	display.oled.writeString(font, 1, "pIP:"+publicIp, 1, false, 0, false);
+  drawConnectIcon(display, 0,yOffset, true);
+  display.oled.setCursor(13,yOffset);
+	display.oled.writeString(font, 1, publicIp, 1, false, 0, false);
 	yOffset += lineSize;
-}
+} 
 
+
+// show loop related status problems
+if (status && suggested) {
+    var notLoopingReason = suggested.reason;
+    if (status.suspended == true) {
+        wipeIfAlreadyUsed(yOffset);
+        display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, false, 0, false);
+    }
+    else if (notLoopingReason.includes("CGM is calibrating")) {
+        wipeIfAlreadyUsed(yOffset);
+        display.oled.writeString(font, 1, "CGM calib./???/noisy", 1, false, 0, false);
+    }
+    else if (notLoopingReason.includes("CGM data is unchanged")) {
+        wipeIfAlreadyUsed(yOffset);
+        display.oled.writeString(font, 1, "CGM data unchanged", 1, false, 0, false);
+    }
+    else if (notLoopingReason.includes("BG data is too old")) {
+        wipeIfAlreadyUsed(yOffset);
+        display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
+    }
+    else if (notLoopingReason.includes("currenttemp rate")) {
+        wipeIfAlreadyUsed(yOffset);
+        display.oled.writeString(font, 1, "Temp. mismatch", 1, false, 0, false);
+    }
+    else if (suggested.carbsReq) {
+        wipeIfAlreadyUsed(yOffset);
+        display.oled.writeString(font, 1, "Carbs Required: "+suggested.carbsReq+'g', 1, false, 0, false);
+    }
+//add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
+}
 
 //dim the display
 display.oled.dimDisplay(true); 
