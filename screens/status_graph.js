@@ -160,6 +160,23 @@ try {
 } catch (e) {
     console.error("Status screen display error: could not parse glucose.json: ", e);
 }
+try {
+    var tmpTarget = JSON.parse(fs.readFileSync(openapsDir+"/settings/local-temptargets.json"));
+    tmpTarget.sort(function(a, b){
+      var keyA = new Date(a.created_at),
+          keyB = new Date(b.created_at);
+      // Compare the 2 dates
+      if(keyA < keyB) return -1;
+      if(keyA > keyB) return 1;
+      return 0;
+    });
+    if (tmpTarget[0] && tmpTarget[0].created_at){
+      var remainingDuration = Math.round(((new Date(tmpTarget[0].created_at).getTime() + tmpTarget[0].duration * 60000) - Date.now()) / 60000);
+      tmpTarget[0].remainingDuration = remainingDuration;
+    }
+} catch (e) {
+    console.error("Status screen display error: could not parse local-temptargets.json");
+}
 
 
 
@@ -171,14 +188,19 @@ display.oled.drawLine(1, 63, 127, 63, 1, false);
 // 16 to 62 is drawing line for BG 30 to 250
 // --> BG range 220 => pixel 46
 // --> 5mg/dl per pixel
-// TODO draw line for tmp target
 var targetLow = 48; // 70/5=14 -> 62-14=48
 var targetHigh = 27; // 180/5=35 -> 62-35=27
 display.oled.drawLine(1, targetHigh, 2, targetHigh, 1, false);
 display.oled.drawLine(1, targetLow, 2, targetLow, 1, false);
 
-if (profile && profile.min_bg){
+
+// draw line for target (or tmpTarget if set)
+if (tmpTarget && tmpTarget[0].remainingDuration){
+  var target = 62-tmpTarget[0].targetBottom/5;
+} else if (profile && profile.min_bg){
   var target = 62-profile.min_bg/5;
+}
+if (target){
   var x0 = 1;
   for (var i=0; i<125;i+=6){
     display.oled.drawLine(x0+i, target, x0+i+1, target, 1, false);

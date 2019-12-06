@@ -158,6 +158,23 @@ try {
     console.error("Status screen display error: could not parse temp_basal.json");
 }
 try {
+    var tmpTarget = JSON.parse(fs.readFileSync(openapsDir+"/settings/local-temptargets.json"));
+    tmpTarget.sort(function(a, b){
+      var keyA = new Date(a.created_at),
+          keyB = new Date(b.created_at);
+      // Compare the 2 dates
+      if(keyA < keyB) return -1;
+      if(keyA > keyB) return 1;
+      return 0;
+    });
+    if (tmpTarget[0] && tmpTarget[0].created_at){
+      var remainingDuration = Math.round(((new Date(tmpTarget[0].created_at).getTime() + tmpTarget[0].duration * 60000) - Date.now()) / 60000);
+      tmpTarget[0].remainingDuration = remainingDuration;
+    }
+} catch (e) {
+    console.error("Status screen display error: could not parse local-temptargets.json");
+}
+try {
     var stats = fs.statSync("/tmp/pump_loop_success");
 } catch (e) {
     console.error("Status screen display error: could not find pump_loop_success");
@@ -226,11 +243,16 @@ if(cob) {
 	display.oled.writeString(font, 1, round(cob.mealCOB, 1).toFixed(1)+"g", 1, false, 0, false);
 }
 
-// display target
-if (profile && profile.min_bg){
+// display target (or tmpTarget if set)
+if (tmpTarget && tmpTarget[0].remainingDuration){
+  var target = tmpTarget[0].targetBottom.toString()+'('+tmpTarget[0].remainingDuration+')';
+} else if (profile && profile.min_bg){
+  var target = profile.min_bg.toString();
+}
+if (target){
 	drawTargetIcon(display,0,42);
 	display.oled.setCursor(9,43);
-	display.oled.writeString(font, 1, profile.min_bg.toString() , 1, false, 0, false);
+	display.oled.writeString(font, 1, target, 1, false, 0, false);
 }
 
 // show tmp basal info

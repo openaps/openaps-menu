@@ -30,14 +30,20 @@
     "menu": [
         {
             "label": "Reboot NOW",
-            "command": "node scripts/display_image.js ./static/black.png; shutdown -r now;",
+            "command": "shutdown -r now;",
             "emit": "nothing"
         },
         {
             "label": "Shutdown",
-            "command": "node scripts/display_image.js ./static/black.png; shutdown -P now",
+            "command": "shutdown -P now",
             "emit": "nothing"
         }
     ]
+  },
+  {
+	"label": "Pump stats",
+	"command": "./scripts/getpumpstats.sh",
+	"emit": "showoutput"
   }
+  
 ]
