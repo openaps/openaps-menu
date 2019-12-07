@@ -1,4 +1,4 @@
-// scripts/status_text.js
+// screens/status_text.js
 // Text based APS status screen 
 //
 // Author: juehv

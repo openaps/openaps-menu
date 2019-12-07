@@ -1,4 +1,4 @@
-// scripts/status_system.js
+// screens/status_system.js
 // System screen for system related information
 //
 // Author: juehv

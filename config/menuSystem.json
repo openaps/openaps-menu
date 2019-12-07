@@ -35,8 +35,8 @@
         },
         {
             "label": "Shutdown",
-            "command": "shutdown -P now",
-            "emit": "blankScreen"
+            "command": "node ./scripts/clear_screen.js && shutdown -P now",
+            "emit": "nothing"
         }
     ]
   },

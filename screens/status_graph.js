@@ -1,4 +1,4 @@
-// scripts/status_graph.js
+// screens/status_graph.js
 // Graph screen for cgm and bolus information  
 //
 // Author: juehv

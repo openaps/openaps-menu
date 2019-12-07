@@ -1,4 +1,4 @@
-// scripts/status_text.js
+// screens/status_text.js
 // Status screen for drained battery
 //
 // Author: juehv

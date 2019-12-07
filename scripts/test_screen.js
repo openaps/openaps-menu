@@ -1,4 +1,8 @@
-// oaps-hid/index.js
+// scripts/test_screen.js
+// Set up libraries and screen preferences to test a menu screen (which is specified in last line)
+//
+// Author: juehv
+// License: AGPLv3
 
 /*jslint node: true */
 /*jslint esversion: 6 */

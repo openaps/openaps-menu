@@ -84,9 +84,6 @@ hidMenu
 .on('showoutput', function (err, stdout, stderr) {
   display.clear();
   display.write(stdout);
-})
-.on('blankScreen', function (err, stdout, stderr) {
-  display.clear();
 });
 
 // setup battery drained mode
