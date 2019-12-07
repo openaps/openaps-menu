@@ -1,6 +1,6 @@
 [
   {
-    "label": "Wifi",
+    "label": "Network",
     "menu": [
       {
         "label": "Current Wifi Network",
@@ -36,7 +36,7 @@
         {
             "label": "Shutdown",
             "command": "shutdown -P now",
-            "emit": "nothing"
+            "emit": "blankScreen"
         }
     ]
   },

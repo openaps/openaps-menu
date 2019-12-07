@@ -163,8 +163,8 @@ try {
       var keyA = new Date(a.created_at),
           keyB = new Date(b.created_at);
       // Compare the 2 dates
-      if(keyA < keyB) return -1;
-      if(keyA > keyB) return 1;
+      if(keyA < keyB) return 1;
+      if(keyA > keyB) return -1;
       return 0;
     });
     if (tmpTarget[0] && tmpTarget[0].created_at){
@@ -235,8 +235,8 @@ if(iob) {
 
 // display COB
 if(cob) {
-	if (iob >= 10.0) {
-		display.oled.setCursor(100,31);
+	if (cob.mealCOB >= 10.0) {
+		display.oled.setCursor(99,31);
 	} else {
 		display.oled.setCursor(105,31);
 	}
@@ -244,7 +244,7 @@ if(cob) {
 }
 
 // display target (or tmpTarget if set)
-if (tmpTarget && tmpTarget[0].remainingDuration){
+if (tmpTarget && tmpTarget[0].remainingDuration && tmpTarget[0].remainingDuration > 0){
   var target = tmpTarget[0].targetBottom.toString()+'('+tmpTarget[0].remainingDuration+')';
 } else if (profile && profile.min_bg){
   var target = profile.min_bg.toString();

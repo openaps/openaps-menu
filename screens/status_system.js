@@ -230,6 +230,13 @@ if (publicIp){
 	yOffset += lineSize;
 } 
 
+if (yOffset === 16){
+  // no network information shown
+  drawConnectIcon(display, 0,yOffset, false);
+  display.oled.setCursor(13,yOffset);
+	display.oled.writeString(font, 1, "No network connection.", 1, false, 0, false);
+	yOffset += lineSize;
+}
 
 // show loop related status problems
 if (status && suggested) {

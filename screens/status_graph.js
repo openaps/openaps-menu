@@ -166,8 +166,8 @@ try {
       var keyA = new Date(a.created_at),
           keyB = new Date(b.created_at);
       // Compare the 2 dates
-      if(keyA < keyB) return -1;
-      if(keyA > keyB) return 1;
+      if(keyA < keyB) return 1;
+      if(keyA > keyB) return -1;
       return 0;
     });
     if (tmpTarget[0] && tmpTarget[0].created_at){
@@ -195,7 +195,7 @@ display.oled.drawLine(1, targetLow, 2, targetLow, 1, false);
 
 
 // draw line for target (or tmpTarget if set)
-if (tmpTarget && tmpTarget[0].remainingDuration){
+if (tmpTarget && tmpTarget[0].remainingDuration && tmpTarget[0].remainingDuration > 0){
   var target = 62-tmpTarget[0].targetBottom/5;
 } else if (profile && profile.min_bg){
   var target = 62-profile.min_bg/5;
@@ -313,7 +313,8 @@ if (carbHistory){
 				console.log(x)
 
 				var y = (ylons[x-1] != null) ? ylons[x-1] : 16;
-				
+				if (y < 20) y = 25; // when value is high, place carbs in the middle to make them visible
+        
 				drawDot(display,x, y);
 		}
 	}

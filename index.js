@@ -73,8 +73,8 @@ if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "expl
 const screens = [textStatus, graphStatus, systemStatus];
 
 // setup sub-menus
-const menuApsPath = process.cwd() + path.sep + './scripts/menuAPS.json';
-const menuSystemPath = process.cwd() + path.sep + './scripts/menuSystem.json';
+const menuApsPath = process.cwd() + path.sep + './config/menuAPS.json';
+const menuSystemPath = process.cwd() + path.sep + './config/menuSystem.json';
 const subMenus = [menuApsPath, menuApsPath, menuSystemPath];
 
 var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens, subMenus);
@@ -84,6 +84,9 @@ hidMenu
 .on('showoutput', function (err, stdout, stderr) {
   display.clear();
   display.write(stdout);
+})
+.on('blankScreen', function (err, stdout, stderr) {
+  display.clear();
 });
 
 // setup battery drained mode
