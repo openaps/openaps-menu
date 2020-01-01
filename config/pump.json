@@ -1,0 +1,9 @@
+{
+  "pumpBatteryTypes": [
+    { "type": "Alkaline", "high": 1.47, "low": 1.20 },
+    { "type": "Lithium", "high": 1.64, "low": 1.22 },
+    { "type": "NiZn", "high": 1.7, "low": 1.35 }
+  ],
+  "pumpBatteryIndex": 3,
+  "pumpReservoirSize" : 300
+}

@@ -28,18 +28,16 @@ var drawTargetIcon = require('../lib/utils/utils.js').drawTargetIcon;
 const execSync = require('child_process').execSync;
 
 
-//
-//Start of status display function
-//
-
-module.exports = textStatus;
-function textStatus(display, openapsDir) {
-//clear the buffer
-display.oled.clearDisplay(true);
-
+function drawSymbolLine(display, openapsDir){
 //
 // BEGIN Symbol Line (from left to right)
 //
+try {
+    var pumpPref = JSON.parse(fs.readFileSync("./config/pump.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse config/pump.json: ", e);
+    //var pumpPref = {pumpReservoirSize = 3, pumpBatteryTypes}
+}
 try {
     var pumpBatterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/battery.json"));
 } catch (e) {
@@ -73,10 +71,10 @@ try {
 }
 
 // show pump battery level
-if(pumpBatterylevel && pumpBatterylevel.voltage) { 
+if(pumpPref && pumpBatterylevel && pumpBatterylevel.voltage) { 
   // set your battery voltage here
-  var voltageHigh = 1.7;
-  var voltageLow = 1.4;
+  var voltageHigh = pumpPref.pumpBatteryTypes[pumpPref.pumpBatteryIndex].high;
+  var voltageLow = pumpPref.pumpBatteryTypes[pumpPref.pumpBatteryIndex].low;
   
   var battlevel = ((pumpBatterylevel.voltage - voltageLow) / (voltageHigh - voltageLow)) * 100.0;
   battlevel = (battlevel > 100 ? 100 : battlevel);    
@@ -86,7 +84,8 @@ if(pumpBatterylevel && pumpBatterylevel.voltage) {
 }
 
 // show pump reservoir icon
-if (reservoir){
+if (pumpPref && reservoir){
+  reservoir = reservoir / (pumpPref.pumpReservoirSize / 100);
   drawReservoirIcon(display, 22, 0, reservoir);
 } else {
   drawReservoirIcon(display, 22, 0, -1);
@@ -99,7 +98,7 @@ hour = (hour < 10 ? "0" : "") + hour;
 var min  = nowDate.getMinutes();
 min = (min < 10 ? "0" : "") + min;
 
-display.oled.setCursor(50,1);
+display.oled.setCursor(48,1);
 display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
 
 
@@ -127,6 +126,18 @@ if(batterylevel) {
 //
 // END Symbol Line
 //
+}
+
+//
+//Start of status display function
+//
+
+module.exports = textStatus;
+function textStatus(display, openapsDir) {
+//clear the buffer
+display.oled.clearDisplay(true);
+
+drawSymbolLine(display, openapsDir);
 
 //
 // BEGIN Text Status
@@ -204,10 +215,16 @@ if(bg && profile) {
     display.oled.setCursor(0,16);
     display.oled.writeString(font, 3, ""+convertBg(bg[0].glucose, profile), 1, false, 0, false);
     
-	// display BG trend arrow (or cross if old)
+	// display BG trend arrow (or if old, cross bg and show age in min)
 	var curPos = display.oled.cursor_x + 1 ;
     if (minutes >= 11 ){
       display.oled.fillRect(0, 25, curPos, 3, 1, false);
+      
+      display.oled.setCursor(curPos+5,16);
+      display.oled.writeString(font, 1, ""+minutes, 1, false, 0, false);
+      
+	    curPos = display.oled.cursor_x + 1 ;
+      display.oled.fillRect(curPos, 15, 1, 3, 1, false);
     } else if (delta) {
       if (delta >= 5) {
         drawArrowUp(display, curPos+3, 18);
