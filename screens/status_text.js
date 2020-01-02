@@ -80,9 +80,14 @@ try {
     console.error("Status screen display error: could not parse local-temptargets.json");
 }
 try {
-    var stats = fs.statSync("/tmp/pump_loop_success");
+    var loopSuccess = fs.statSync("/tmp/pump_loop_success");
 } catch (e) {
     console.error("Status screen display error: could not find pump_loop_success");
+}
+try {
+    var status = JSON.parse(fs.readFileSync(openapsDir+"/monitor/status.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse status.json: ", e);
 }
 
 // display BG and trend
@@ -172,18 +177,20 @@ if(tmpBasal) {
 }
 
 //calculate timeago for last successful loop
-if(stats) {
-  var startDate = new Date(stats.mtime);
+if(loopSuccess) {
+  var startDate = new Date(loopSuccess.mtime);
   var endDate = new Date();
   var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
 
   //display last loop time
-  if (minutes > 9){
+  if (status.suspended == true){
+	drawLoopIcon(display,95,44,true,true);
+  } else if (minutes > 9){
 	drawLoopIcon(display,95,44,true);
   } else{
 	drawLoopIcon(display,95,44,false);
 	display.oled.setCursor(116,47);
-	display.oled.writeString(font, 2, ''+minutes, 1, false, 0, false);
+	display.oled.writeString(font, 2, minutes+"'", 1, false, 0, false);
   }
 } else {
   drawLoopIcon(display,95,44,true);

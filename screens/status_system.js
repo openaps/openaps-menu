@@ -150,7 +150,7 @@ if (btIp){
 	yOffset += lineSize;
 }
 
-if (publicIp){
+if (publicIp && false){
   drawConnectIcon(display, 0,yOffset, true);
   display.oled.setCursor(13,yOffset);
 	display.oled.writeString(font, 1, publicIp, 1, false, 0, false);
@@ -166,7 +166,7 @@ if (yOffset === 16){
 }
 
 // show loop related status problems
-if (status && suggested) {
+if (status) {
     var notLoopingReason = suggested.reason;
     if (status.suspended == true) {
         wipeIfAlreadyUsed(display, yOffset);

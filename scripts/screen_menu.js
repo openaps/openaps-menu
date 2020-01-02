@@ -95,47 +95,28 @@ module.exports = function (configButtons, configMenus, display, openapsDir, scre
 	// button events
 	 piButtons
 	.on('clicked', function (gpio, data) {
-		// if (displayDirty) {
-		  // fake menu changed to force redraw
-		  // menu.emit('menu_changed');
-		  // displayDirty = false;
-		// }
-		// else {
 		  switch(parseInt(gpio, 10)) {
 			case gpios.buttonUp:
-				// if (!displayDirty) {
-				  up();
-				// }
+	      up();
 				break;
 
 			case gpios.buttonDown:
-				// if (!displayDirty) {
-				  down();
-				// }
+		    down();
 				break;
 		  }
 		resetTimer();
-		// }
 	})
 	.on('pressed', function (gpio, data) {
-		// if (displayDirty) {
-		  // fake menu changed to force redraw
-		  // menu.emit('menu_changed');
-		  // displayDirty = false;
-		// }
-		// else {
 		  switch (parseInt(gpio, 10)) {
 			case gpios.buttonUp:
 				esc();
 				break;
 
 			case gpios.buttonDown:
-				// displayDirty = true; // activate may write something to the display
 				act();
 				break;
 		  }
 		resetTimer();
-		// }
 	})
 	.on('released', function (gpio, data) {
 		// if (displayDirty) {
