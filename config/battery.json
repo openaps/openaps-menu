@@ -1,18 +1,7 @@
 {
   "curve": [
-    { "voltage": 4.15, "percent": 98.56 },
-    { "voltage": 4.09, "percent": 95.40 },
-    { "voltage": 4.01, "percent": 85.00 },
-    { "voltage": 3.94, "percent": 75.00 },
-    { "voltage": 3.84, "percent": 65.00 },
-    { "voltage": 3.79, "percent": 55.00 },
-    { "voltage": 3.74, "percent": 45.00 },
-    { "voltage": 3.70, "percent": 35.00 },
-    { "voltage": 3.68, "percent": 25.00 },
-    { "voltage": 3.65, "percent": 15.00 },
-    { "voltage": 3.62, "percent": 5.00 },
-    { "voltage": 3.60, "percent": 2.50 },
-    { "voltage": 3.55, "percent": 0.01 }
+    { "voltage": 4.10, "percent": 98.0 },
+    { "voltage": 3.65, "percent": 5.00 }
   ],
   "mAh": 2200,
   "maxVoltage": 4.2

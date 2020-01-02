@@ -17,12 +17,7 @@ var round = require('../lib/utils/utils.js').round;
 var convertBg= require('../lib/utils/utils.js').convertBg;
 var stripLeadingZero= require('../lib/utils/utils.js').stripLeadingZero;
 
-var drawReservoirIcon = require('../lib/utils/utils.js').drawReservoirIcon;
-var drawBatteryIcon = require('../lib/utils/utils.js').drawBatteryIcon;
-var drawWiFiIcon = require('../lib/utils/utils.js').drawWiFiIcon;
-var drawBTIcon = require('../lib/utils/utils.js').drawBTIcon;
-var drawConnectIcon = require('../lib/utils/utils.js').drawConnectIcon;
-const execSync = require('child_process').execSync;
+var drawSymbolLine = require('./symbol_line.js');
 
 var drawDot = require('../lib/utils/utils.js').drawDot;
 
@@ -32,100 +27,11 @@ var drawDot = require('../lib/utils/utils.js').drawDot;
 //
 
 module.exports = graphicalStatus;
-function graphicalStatus(display, openapsDir) {
+function graphicalStatus(display, openapsDir, pumpPref) {
 //clear display buffer
 display.oled.clearDisplay(true); 
 
-//
-// BEGIN Symbol Line (from left to right)
-//
-try {
-    var pumpBatterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/battery.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse battery.json: ", e);
-}
-try {
-    var reservoir = JSON.parse(fs.readFileSync(openapsDir+"/monitor/reservoir.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse reservoir.json: ", e);
-}
-try{
-	var hasPublicIp = fs.existsSync('/tmp/hasPublicIp');
-} catch (e) {
-	// not online
-  console.log('No "/tmp/hasPublicIp" found. Not online?');
-}
-try {
-	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
-} catch (e){
-	console.error("Status screen display error: could not execute wifiIp: ", e);
-}
-try {
-	var btIp = execSync('ip -f inet -o addr show bnep0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
-} catch (e){
-	console.error("Status screen display error: could not execute btIp: ", e);
-}
-try {
-    var batterylevel = JSON.parse(fs.readFileSync(openapsDir+"/monitor/edison-battery.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse edison-battery.json: ", e);
-}
-
-// show pump battery level
-if(pumpBatterylevel && pumpBatterylevel.voltage) { 
-  // set your battery voltage here
-  var voltageHigh = 1.7;
-  var voltageLow = 1.4;
-  
-  var battlevel = ((pumpBatterylevel.voltage - voltageLow) / (voltageHigh - voltageLow)) * 100.0;
-  battlevel = (battlevel > 100 ? 100 : battlevel);    
-  drawBatteryIcon(display, 0, 0 ,battlevel);
-} else {
-  drawBatteryIcon(display, 0, 0 ,-1);
-}
-
-// show pump reservoir icon
-if (reservoir){
-  drawReservoirIcon(display, 22, 0, reservoir);
-} else {
-  drawReservoirIcon(display, 22, 0, -1);
-}
-
-// show current time
-var nowDate = new Date();
-var hour = nowDate.getHours();
-hour = (hour < 10 ? "0" : "") + hour;
-var min  = nowDate.getMinutes();
-min = (min < 10 ? "0" : "") + min;
-
-display.oled.setCursor(50,1);
-display.oled.writeString(font, 1, hour+":"+min, 1, false, 0, false);
-
-
-// show online connection icon if connected to the Internet
-// TODO or WiFi AP icon if AP mode active
-if (hasPublicIp){
-  drawConnectIcon(display, 82, 1, true);
-} else {
-  drawConnectIcon(display, 82, 1, false);
-}
-
-// show WiFi icon if connected to a Wifi network or Bluetooth icon if connected to a PAN
-if (wifiIp){
-  drawWiFiIcon(display, 98, 0);
-} else if (btIp){
-  drawBTIcon(display, 99, 0);
-}
-
-// show local battery level
-if(batterylevel) {
-  drawBatteryIcon(display, 113, 0 , batterylevel.battery);
-} else {
-  drawBatteryIcon(display, 113, 0 ,-1);
-}
-//
-// END Symbol Line
-//
+drawSymbolLine(display, openapsDir, pumpPref);
 
 //
 // BEGIN Graph Status
@@ -310,7 +216,7 @@ if (carbHistory){
 				var x = zero_x + Math.round(((((carbDate - zerotime)/1000)/60)/5));
 				if (x < 1) break;
 				if ( x > 127 ) x = 127;
-				console.log(x)
+				//console.log(x)
 
 				var y = (ylons[x-1] != null) ? ylons[x-1] : 16;
 				if (y < 20) y = 25; // when value is high, place carbs in the middle to make them visible

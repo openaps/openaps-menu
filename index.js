@@ -59,7 +59,6 @@ const menuConfig = {
   }
 };
 
-
 // setup menu screens
 // TODO add radiofruit
 if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "explorer-hat") {
@@ -77,7 +76,20 @@ const menuApsPath = process.cwd() + path.sep + './config/menuAPS.json';
 const menuSystemPath = process.cwd() + path.sep + './config/menuSystem.json';
 const subMenus = [menuApsPath, menuApsPath, menuSystemPath];
 
-var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens, subMenus);
+// load pump preferences for symbol line in screens
+try {
+    var pumpPref = JSON.parse(fs.readFileSync("./config/pump.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse config/pump.json: ", e);
+    // fallback options
+    var pumpPref = {
+      "pumpBatteryTypes": [{ "type": "Default", "high": 1.47, "low": 1.20 }],
+      "pumpBatteryIndex": 0,
+      "pumpReservoirSize" : 300
+    }
+}
+
+var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens, subMenus, pumpPref);
 
 // configure menu events
 hidMenu

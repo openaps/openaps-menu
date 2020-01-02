@@ -44,4 +44,17 @@ try {
 	throw '';
 }
 
-require('../screens/status_graph.js')(display, openapsDir);
+// load pump preferences for symbol line in screens
+try {
+    var pumpPref = JSON.parse(fs.readFileSync("../config/pump.json"));
+} catch (e) {
+    console.error("Status screen display error: could not parse config/pump.json: ", e);
+    // fallback options
+    var pumpPref = {
+      "pumpBatteryTypes": [{ "type": "Default", "high": 1.47, "low": 1.20 }],
+      "pumpBatteryIndex": 0,
+      "pumpReservoirSize" : 300
+    }
+}
+
+require('../screens/status_system.js')(display, openapsDir, pumpPref);

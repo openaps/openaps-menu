@@ -8,10 +8,11 @@
 /*jslint esversion: 6 */
 
 'use strict';
+
 const Menube = require('menube');
 const font = require('oled-font-5x7');
 
-module.exports = function (configButtons, configMenus, display, openapsDir, screens, subMenuFiles) {
+module.exports = function (configButtons, configMenus, display, openapsDir, screens, subMenuFiles, pumpPref) {
 	if (!configButtons.gpios || !configButtons.gpios.buttonUp || !configButtons.gpios.buttonDown) {
 		throw new Error('Incomplete pins definition in configuration.');
 	}
@@ -166,7 +167,7 @@ module.exports = function (configButtons, configMenus, display, openapsDir, scre
 	// draw active screen
 	function redraw () {
 		if (display){
-			screens[screensPos](display, openapsDir);
+			screens[screensPos](display, openapsDir, pumpPref);
 		}
 	}
 	
