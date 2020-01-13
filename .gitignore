@@ -1,7 +1,9 @@
 bower_components/
 node_modules/
+config/pump.json
 
 bundle/bundle.out.js
+config/pump.json
 
 .idea/
 *.iml
@@ -22,4 +24,3 @@ npm-debug.log
 bin/__pycache__
 
 package-lock.json
-config/
