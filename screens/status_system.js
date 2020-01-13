@@ -72,13 +72,13 @@ try{
 	var hasPublicIp = fs.existsSync('/tmp/publicIP');
 } catch (e) {
 	// not online
-  console.log('No "/tmp/hasPublicIp" found. Not online?');
+  console.log('No "/tmp/publicIP" found. Not online?');
 }
 try {
   if (hasPublicIp) 
 	  var publicIp = fs.readFileSync('/tmp/publicIP').toString().trim();
 } catch (e) {
-	console.error("Status screen display error: could not parse /tmp/hasPublicIp: ", e);
+	console.error("Status screen display error: could not parse /tmp/publicIP: ", e);
 }
 try {
     var status = JSON.parse(fs.readFileSync(openapsDir+"/monitor/status.json"));
@@ -150,7 +150,7 @@ if (btIp){
 	yOffset += lineSize;
 }
 
-if (publicIp && false){
+if (publicIp){
   drawConnectIcon(display, 0,yOffset, true);
   display.oled.setCursor(13,yOffset);
 	display.oled.writeString(font, 1, publicIp, 1, false, 0, false);

@@ -4,6 +4,6 @@
     { "type": "Lithium", "high": 1.64, "low": 1.22 },
     { "type": "NiZn", "high": 1.7, "low": 1.35 }
   ],
-  "pumpBatteryIndex": 2,
+  "pumpBatteryIndex": 0,
   "pumpReservoirSize" : 300
 }

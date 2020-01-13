@@ -38,7 +38,7 @@ try{
 	var hasPublicIp = fs.existsSync('/tmp/publicIP');
 } catch (e) {
 	// not online
-  console.log('No "/tmp/hasPublicIp" found. Not online?');
+  console.log('No "/tmp/publicIP" found. Not online?');
 }
 try {
 	var wifiIp = execSync('ip -f inet -o addr show wlan0|cut -d " " -f 7 |cut -d "/" -f 1').toString();
