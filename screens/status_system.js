@@ -69,14 +69,14 @@ try {
 	console.error("Status screen display error: could not execute wifiName: ", e);
 }
 try{
-	var hasPublicIp = fs.existsSync('/tmp/hasPublicIp');
+	var hasPublicIp = fs.existsSync('/tmp/publicIP');
 } catch (e) {
 	// not online
   console.log('No "/tmp/hasPublicIp" found. Not online?');
 }
 try {
   if (hasPublicIp) 
-	  var publicIp = fs.readFileSync('/tmp/hasPublicIp').toString().trim();
+	  var publicIp = fs.readFileSync('/tmp/publicIP').toString().trim();
 } catch (e) {
 	console.error("Status screen display error: could not parse /tmp/hasPublicIp: ", e);
 }

@@ -35,7 +35,7 @@ try {
     console.error("Status screen display error: could not parse reservoir.json: ", e);
 }
 try{
-	var hasPublicIp = fs.existsSync('/tmp/hasPublicIp');
+	var hasPublicIp = fs.existsSync('/tmp/publicIP');
 } catch (e) {
 	// not online
   console.log('No "/tmp/hasPublicIp" found. Not online?');
@@ -63,8 +63,9 @@ if(pumpPref && pumpBatterylevel && pumpBatterylevel.voltage) {
   var voltageLow = pumpPref.pumpBatteryTypes[pumpPref.pumpBatteryIndex].low;
   
   var battlevel = ((pumpBatterylevel.voltage - voltageLow) / (voltageHigh - voltageLow)) * 100.0;
-  battlevel = (battlevel > 100 ? 100 : battlevel);    
-  drawBatteryIcon(display, 0, 0 ,battlevel);
+  battlevel = (battlevel > 100 ? 100 : battlevel);
+  battlevel = (battlevel < 0 ? 0 : battlevel);
+  drawBatteryIcon(display, 0, 0, battlevel);
 } else {
   drawBatteryIcon(display, 0, 0 ,-1);
 }
@@ -72,6 +73,8 @@ if(pumpPref && pumpBatterylevel && pumpBatterylevel.voltage) {
 // show pump reservoir icon
 if (pumpPref && reservoir){
   reservoir = reservoir / (pumpPref.pumpReservoirSize / 100);
+  reservoir = (reservoir > 100 ? 100 : reservoir);
+  reservoir = (reservoir < 0 ? 0 : reservoir);
   drawReservoirIcon(display, 22, 0, reservoir);
 } else {
   drawReservoirIcon(display, 22, 0, -1);
