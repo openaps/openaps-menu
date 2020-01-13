@@ -1,7 +1,6 @@
 bower_components/
 node_modules/
 
-
 bundle/bundle.out.js
 
 .idea/
@@ -23,3 +22,4 @@ npm-debug.log
 bin/__pycache__
 
 package-lock.json
+config/
