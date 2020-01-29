@@ -1,5 +1,5 @@
 // screens/symbol_line.js
-// Text based APS status screen 
+// Draws upper line with status symbols 
 //
 // Author: juehv
 // License: AGPLv3

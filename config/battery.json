@@ -1,7 +1,9 @@
 {
   "curve": [
     { "voltage": 4.10, "percent": 98.0 },
-    { "voltage": 3.65, "percent": 5.00 }
+    { "voltage": 3.65, "percent": 5.00 },
+    { "voltage": 3.57, "percent": 1.00 },
+    { "voltage": 3.50, "percent": 0.00 }
   ],
   "mAh": 2200,
   "maxVoltage": 4.2

@@ -22,6 +22,7 @@ var drawSymbolLine = require('./symbol_line.js');
 var drawWiFiIcon = require('../lib/utils/utils.js').drawWiFiIcon;
 var drawBTIcon = require('../lib/utils/utils.js').drawBTIcon;
 var drawConnectIcon = require('../lib/utils/utils.js').drawConnectIcon;
+var drawUsbIcon = require('../lib/utils/utils.js').drawUsbIcon;
 const execSync = require('child_process').execSync;
 
 //
@@ -109,12 +110,12 @@ if (hostname){
 
 if (usbIp){
   if (hostname){
-    drawConnectIcon(display, 0,yOffset+5, true);
+    drawUsbIcon(display, 0,yOffset+5);
     display.oled.setCursor(13,yOffset);
     display.oled.writeString(font, 1, hostname+'.local', 1, false, 0, false);
     yOffset += lineSize;
   } else {
-    drawConnectIcon(display, 0,yOffset, true);
+    drawUsbIcon(display, 0,yOffset);
   }
   display.oled.setCursor(13,yOffset);
 	display.oled.writeString(font, 1, usbIp, 1, false, 0, false);

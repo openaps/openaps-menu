@@ -1,5 +1,5 @@
-// scripts/test_screen.js
-// Set up libraries and screen preferences to test a menu screen (which is specified in last line)
+// screens/symbol_line.js
+// Screen for testing icons
 //
 // Author: juehv
 // License: AGPLv3
@@ -57,5 +57,37 @@ try {
     }
 }
 
-//require('../screens/status_system.js')(display, openapsDir, pumpPref);
-require('./icon_test.js')(display, openapsDir, pumpPref);
+var drawReservoirIcon = require('../lib/utils/utils.js').drawReservoirIcon;
+var drawBatteryIcon = require('../lib/utils/utils.js').drawBatteryIcon;
+var drawWiFiIcon = require('../lib/utils/utils.js').drawWiFiIcon;
+var drawWiFiApIcon = require('../lib/utils/utils.js').drawWiFiApIcon;
+var drawBTIcon = require('../lib/utils/utils.js').drawBTIcon;
+var drawUsbIcon = require('../lib/utils/utils.js').drawUsbIcon;
+var drawConnectIcon = require('../lib/utils/utils.js').drawConnectIcon;
+const execSync = require('child_process').execSync;
+
+// show battery levels
+drawBatteryIcon(display, 0, 0, 100);
+drawBatteryIcon(display, 0, 11, 60);
+drawBatteryIcon(display, 0, 22, 30);
+drawBatteryIcon(display, 0, 33, 5);
+drawBatteryIcon(display, 0, 44, 0);
+drawBatteryIcon(display, 0, 55 ,-1);
+
+// show pump reservoir icon
+drawReservoirIcon(display, 22, 0, 100);
+drawReservoirIcon(display, 22, 11, 60);
+drawReservoirIcon(display, 22, 22, 30);
+drawReservoirIcon(display, 22, 33, 5);
+drawReservoirIcon(display, 22, 44, 0);
+drawReservoirIcon(display, 22, 55, -1);
+
+// show online connection icon if connected to the Internet
+drawConnectIcon(display, 82, 1, true);
+drawConnectIcon(display, 82, 12, false);
+
+// show WiFi icon
+drawWiFiIcon(display, 98, 0);
+drawWiFiApIcon(display, 98, 11);
+drawBTIcon(display, 99, 22);
+drawUsbIcon(display, 98, 34);
