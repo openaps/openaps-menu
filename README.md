@@ -16,10 +16,10 @@ Each screen has a sub-menu that can be accessed by long pressing the down button
 The screen will turn black after one minute of inactivity.
 
 ### Screen scrolling:
-![Screen scrolling](https://github.com/openaps/openaps-menu/blob/dev/images/screen_scrolling.gif)
+![Screen scrolling](images/screen_scrolling.gif)
 
 ### Entering a sub-menu:
-![Entering a sub-menu](https://github.com/openaps/openaps-menu/blob/dev/images/entering_submenu.gif)
+![Entering a sub-menu](images/entering_submenu.gif)
 
 ## Screens
 The current version provides the following screens.
@@ -28,27 +28,27 @@ The current version provides the following screens.
 ### Symbol Line
 Every screen has a symbol line on top. It shows the most important status information of the pump and the rig.
 
-![Symbol Line](https://github.com/openaps/openaps-menu/blob/dev/images/symbol_line.jpg)
+![Symbol Line](images/symbol_line.jpg)
 
 ### Text Status
 The text status screen aims to provide most necessary information in one compact screen.
 
-![Text Status](https://github.com/openaps/openaps-menu/blob/dev/images/text_status.jpg)
+![Text Status](images/text_status.jpg)
 
 ### Graph
 The graph screen aims to provide relevant data from the near past in a nice looking way.
 
-![Graph](https://github.com/openaps/openaps-menu/blob/dev/images/graph.jpg)
+![Graph](images/graph.jpg)
 
 ### System Status
 The system status screen aims to provide essential system data in one compact screen.
 
-![System Status](https://github.com/openaps/openaps-menu/blob/dev/images/system_status.jpg)
+![System Status](images/system_status.jpg)
 
 ### Low Battery
 The rig shows a blinking low battery screen when the battery is below 5%. If it doesn't blink, the rig is already shut down. When you connect it to power, it will reboot.
 
-![Low Battery](https://github.com/openaps/openaps-menu/blob/dev/images/low_battery.gif)
+![Low Battery](images/low_battery.gif)
 
 ## Configuration
 The screen system has a default configuration to fulfill at least the same functionality as the openaps-menu v0. Sub-menus can be customized in the files `config/menuAPS.json` (text status, graph) and `menuSystem.json` (system).
