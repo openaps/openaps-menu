@@ -3,10 +3,10 @@ This is the repository holding the menu-based software code, which you may choos
 
 See [here](https://github.com/EnhancedRadioDevices/Explorer-HAT) for more details on the Explorer HAT hardware. Or [here](https://www.adafruit.com/product/4074) for Adafruit Radiofruit Bonnet.
 
-*NOTE*: You need this code to measure the battery voltage of the rig. For details see below.
+**NOTE**: You need this code to measure the battery voltage of the rig. For details see below.
 
 ## Next UI v1
-*NOTE*: The current version is a dev version and may contain bugs. Only Explorer HAT is currently supported. Works with the current (01/2020) dev version of OpenAPS.
+**NOTE**: The current version is a dev version and may contain bugs. Only Explorer HAT is currently supported. Works with the current (01/2020) dev version of OpenAPS.
 
 This repository contains the new version "Next UI v1" of the openaps-menu software. 
 It is a screen-based approach as we know it from medtronic pumps. 
@@ -31,7 +31,7 @@ Every screen has a symbol line on top. It shows the most important status inform
 ![Symbol Line](https://github.com/openaps/openaps-menu/blob/dev/images/symbol_line.jpg)
 
 ### Text Status
-The text status screen aims to provide most nessecary information in one compact screen.
+The text status screen aims to provide most necessary information in one compact screen.
 
 ![Text Status](https://github.com/openaps/openaps-menu/blob/dev/images/text_status.jpg)
 
@@ -46,9 +46,9 @@ The system status screen aims to provide essential system data in one compact sc
 ![System Status](https://github.com/openaps/openaps-menu/blob/dev/images/system_status.jpg)
 
 ### Low Battery
-The rig shows a blinking low battery scren when the battery is below 5%. If it doesn't blink, the rig is already shut down. When you connect it to power, it will reboot.
+The rig shows a blinking low battery screen when the battery is below 5%. If it doesn't blink, the rig is already shut down. When you connect it to power, it will reboot.
 
-![Low Battery](https://github.com/openaps/openaps-menu/blob/dev/images/low_battery.jpg)
+![Low Battery](https://github.com/openaps/openaps-menu/blob/dev/images/low_battery.gif)
 
 ## Configuration
 The screen system has a default configuration to fulfill at least the same functionality as the openaps-menu v0. Sub-menus can be customized in the files `config/menuAPS.json` (text status, graph) and `menuSystem.json` (system).
@@ -63,14 +63,14 @@ Basic information about the pump can be configured in `config/pump.json`.
 ## Voltage measurements
 The software supports the measurement of the battery voltage by using the script `scripts/getvoltage.sh`.
 
-*NOTE*: This only works with the Explorer HAT.
+**NOTE**: This only works with the Explorer HAT.
 
 ## ToDo
-The software is currently in testing phase. If you find some bugs please report them as github issue! However there are some features I want to implement:
+The software is currently in testing phase. If you find some bugs please report them as github issue! However, there are some more features I want to implement:
 
 * Clean up code base
 * Automatic battery detection (detects when pump battery is changed and chooses the correct config)
-* BUG: Sometimes the wifi interface has more than one IP. This screws up the status screen. Find a solution to clean old IPs
+* BUG: Sometimes the WiFi interface has more than one IP. This screws up the status screen. Find a solution to clean old IPs
 * BT PAN never tested
 * WiFi Access Point Mode never tested
 * Find a Icon for "temp basal"
