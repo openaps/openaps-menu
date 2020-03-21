@@ -137,7 +137,7 @@ module.exports = function (configButtons, configMenus, display, openapsDir, scre
 			clearTimeout(timer);
 		}
 
-		var timeout = subMenuActive ? 60000 : 15000;
+		var timeout = subMenuActive ? 90000 : 15000;
 		timer = setTimeout(() => {
 			display.clear();
 			screensPos = -1;
