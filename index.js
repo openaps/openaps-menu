@@ -94,7 +94,7 @@ try {
     }
 }
 
-var hidMenu = require('./scripts/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens, subMenus, pumpPref);
+var hidMenu = require('./lib/screen-menu/screen_menu.js')(buttonsConfig, menuConfig, display, openapsDir, screens, subMenus, pumpPref);
 
 // configure menu events
 hidMenu
