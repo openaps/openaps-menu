@@ -63,18 +63,22 @@ const menuConfig = {
 // TODO add radiofruit
 if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "radiofruit"){
 	var textStatus = require('./screens/status_text_128x32.js');
+	var textStatus2 = require('./screens/status_text_128x32_2.js');
 	var graphStatus = require('./screens/status_graph_128x32.js');
 	var systemStatus = require('./screens/status_system_128x32.js');
 	var batteryDrainedScreen = require('./screens/status_battery_drained_128x32.js');
+ 
+  const screens = [textStatus, textStatus2, graphStatus, systemStatus];
 } else if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "explorer-hat") {
 	var textStatus = require('./screens/status_text_128x64.js');
 	var graphStatus = require('./screens/status_graph_128x64.js');
 	var systemStatus = require('./screens/status_system_128x64.js');
 	var batteryDrainedScreen = require('./screens/status_battery_drained_128x64.js');
+ 
+  const screens = [textStatus, graphStatus, systemStatus];
 } else {
 	throw ("hardware type \"" + preferences.hardwaretype + "\" not supported! Exit.");
 }
-const screens = [textStatus, graphStatus, systemStatus];
 
 // setup sub-menus
 const menuApsPath = process.cwd() + path.sep + './config/menuAPS.json';
