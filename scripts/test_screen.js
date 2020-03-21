@@ -57,5 +57,5 @@ try {
     }
 }
 
-require('../screens/status_text_128x32_2.js')(display, openapsDir, pumpPref);
+require('../screens/status_graph_128x32.js')(display, openapsDir, pumpPref);
 //require('./icon_test.js')(display, openapsDir, pumpPref);
