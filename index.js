@@ -61,11 +61,16 @@ const menuConfig = {
 
 // setup menu screens
 // TODO add radiofruit
-if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "explorer-hat") {
-	var textStatus = require('./screens/status_text.js');
-	var graphStatus = require('./screens/status_graph.js');
-	var systemStatus = require('./screens/status_system.js');
-	var batteryDrainedScreen = require('./screens/status_battery_drained.js');
+if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "radiofruit"){
+	var textStatus = require('./screens/status_text_128x32.js');
+	var graphStatus = require('./screens/status_graph_128x32.js');
+	var systemStatus = require('./screens/status_system_128x32.js');
+	var batteryDrainedScreen = require('./screens/status_battery_drained_128x32.js');
+} else if (preferences.hardwaretype && preferences.hardwaretype.toLowerCase() === "explorer-hat") {
+	var textStatus = require('./screens/status_text_128x64.js');
+	var graphStatus = require('./screens/status_graph_128x64.js');
+	var systemStatus = require('./screens/status_system_128x64.js');
+	var batteryDrainedScreen = require('./screens/status_battery_drained_128x64.js');
 } else {
 	throw ("hardware type \"" + preferences.hardwaretype + "\" not supported! Exit.");
 }
