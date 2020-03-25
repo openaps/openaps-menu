@@ -43,21 +43,6 @@ try{
     console.error("Status screen display error: could not parse profile.json: ", e);
 }
 try {
-    var bg = JSON.parse(fs.readFileSync(openapsDir+"/monitor/glucose.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse glucose.json: ", e);
-}
-try {
-    var iob = JSON.parse(fs.readFileSync(openapsDir+"/monitor/iob.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse iob.json: ", e);
-}
-try {
-    var cob = JSON.parse(fs.readFileSync(openapsDir+"/monitor/meal.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse meal.json: ", e);
-}
-try {
     var tmpBasal = JSON.parse(fs.readFileSync(openapsDir+"/monitor/temp_basal.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse temp_basal.json");
@@ -80,11 +65,6 @@ try {
     console.error("Status screen display error: could not parse local-temptargets.json");
 }
 try {
-    var loopSuccess = fs.statSync("/tmp/pump_loop_success");
-} catch (e) {
-    console.error("Status screen display error: could not find pump_loop_success");
-}
-try {
     var status = JSON.parse(fs.readFileSync(openapsDir+"/monitor/status.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse status.json: ", e);
@@ -97,36 +77,54 @@ if (tmpTarget && tmpTarget[0].remainingDuration && tmpTarget[0].remainingDuratio
   var target = profile.min_bg.toString();
 }
 if (target){
-	drawTargetIcon(display,0,13);
-	display.oled.setCursor(9,14);
+	drawTargetIcon(display,0,11);
+	display.oled.setCursor(9,12);
 	display.oled.writeString(font, 1, target, 1, false, 0, false);
 }
 
 // show tmp basal info
 if(tmpBasal) {
-  display.oled.setCursor(0,22);
-  display.oled.writeString(font, 1, "tB "+round(tmpBasal.rate,1).toFixed(1)+"U("+tmpBasal.duration+")", 1, false, 0, false);
-}
-
-//calculate timeago for last successful loop
-if(loopSuccess) {
-  var startDate = new Date(loopSuccess.mtime);
-  var endDate = new Date();
-  var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
-
-  //display last loop time
-  if (status.suspended == true){
-	drawLoopIcon(display,95,13,true,true);
-  } else if (minutes > 9){
-	drawLoopIcon(display,95,13,true);
-  } else{
-	drawLoopIcon(display,95,13,false);
-	display.oled.setCursor(116,15);
-	display.oled.writeString(font, 2, minutes+"'", 1, false, 0, false);
+  var rate = round(tmpBasal.rate,1).toFixed(1);
+  var xOffset = 49;
+	if (rate < 10.0) {
+    xOffset += 6;
+	}
+  if (tmpBasal.duration < 100){
+    xOffset += 6;
   }
-} else {
-  drawLoopIcon(display,95,13,true);
+  if (tmpBasal.duration < 10){
+    xOffset += 6;
+  }
+  display.oled.setCursor(xOffset,13);
+  display.oled.writeString(font, 1, "tB "+rate+"U("+tmpBasal.duration+")", 1, false, 0, false);
 }
+
+// show loop related status problems
+display.oled.setCursor(0,22);
+if (status && status.suspended == true) {
+        display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, false, 0, false);
+} else if (suggested) {    
+  var notLoopingReason = suggested.reason;    
+  if (notLoopingReason.includes("CGM is calibrating")) {
+      display.oled.writeString(font, 1, "CGM calib./???/noisy", 1, false, 0, false);
+  }
+  else if (notLoopingReason.includes("CGM data is unchanged")) {
+      display.oled.writeString(font, 1, "CGM data unchanged", 1, false, 0, false);
+  }
+  else if (notLoopingReason.includes("BG data is too old")) {
+      display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
+  }
+  else if (notLoopingReason.includes("currenttemp rate")) {
+      display.oled.writeString(font, 1, "Temp. mismatch", 1, false, 0, false);
+  }
+  else if (suggested.carbsReq) {
+      display.oled.writeString(font, 1, "Carbs Required: "+suggested.carbsReq+'g', 1, false, 0, false);
+  }
+}
+//add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
+
+
+
 
 //dim the display
 display.oled.dimDisplay(true); 
