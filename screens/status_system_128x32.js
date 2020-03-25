@@ -164,36 +164,6 @@ if (yOffset === 0){
 	yOffset += lineSize;
 }
 
-// show loop related status problems
-if (status) {
-    var notLoopingReason = suggested.reason;
-    if (status.suspended == true) {
-        wipeIfAlreadyUsed(display, yOffset);
-        display.oled.writeString(font, 1, "PUMP SUSPENDED", 1, false, 0, false);
-    }
-    else if (notLoopingReason.includes("CGM is calibrating")) {
-        wipeIfAlreadyUsed(display, yOffset);
-        display.oled.writeString(font, 1, "CGM calib./???/noisy", 1, false, 0, false);
-    }
-    else if (notLoopingReason.includes("CGM data is unchanged")) {
-        wipeIfAlreadyUsed(display, yOffset);
-        display.oled.writeString(font, 1, "CGM data unchanged", 1, false, 0, false);
-    }
-    else if (notLoopingReason.includes("BG data is too old")) {
-        wipeIfAlreadyUsed(display, yOffset);
-        display.oled.writeString(font, 1, "BG data too old", 1, false, 0, false);
-    }
-    else if (notLoopingReason.includes("currenttemp rate")) {
-        wipeIfAlreadyUsed(display, yOffset);
-        display.oled.writeString(font, 1, "Temp. mismatch", 1, false, 0, false);
-    }
-    else if (suggested.carbsReq) {
-        wipeIfAlreadyUsed(display, yOffset);
-        display.oled.writeString(font, 1, "Carbs Required: "+suggested.carbsReq+'g', 1, false, 0, false);
-    }
-//add more on-screen warnings/messages, maybe some special ones for xdrip-js users?
-}
-
 //dim the display
 display.oled.dimDisplay(true); 
 //write buffer to the screen

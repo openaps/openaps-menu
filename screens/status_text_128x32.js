@@ -58,28 +58,6 @@ try {
     console.error("Status screen display error: could not parse meal.json: ", e);
 }
 try {
-    var tmpBasal = JSON.parse(fs.readFileSync(openapsDir+"/monitor/temp_basal.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse temp_basal.json");
-}
-try {
-    var tmpTarget = JSON.parse(fs.readFileSync(openapsDir+"/settings/local-temptargets.json"));
-    tmpTarget.sort(function(a, b){
-      var keyA = new Date(a.created_at),
-          keyB = new Date(b.created_at);
-      // Compare the 2 dates
-      if(keyA < keyB) return 1;
-      if(keyA > keyB) return -1;
-      return 0;
-    });
-    if (tmpTarget[0] && tmpTarget[0].created_at){
-      var remainingDuration = Math.round(((new Date(tmpTarget[0].created_at).getTime() + tmpTarget[0].duration * 60000) - Date.now()) / 60000);
-      tmpTarget[0].remainingDuration = remainingDuration;
-    }
-} catch (e) {
-    console.error("Status screen display error: could not parse local-temptargets.json");
-}
-try {
     var loopSuccess = fs.statSync("/tmp/pump_loop_success");
 } catch (e) {
     console.error("Status screen display error: could not find pump_loop_success");
@@ -92,32 +70,32 @@ try {
 
 // display BG and trend
 if(bg && profile) {
-	// calculate BG age
-    var startDate = new Date(bg[0].date);
-    var endDate = new Date();
-    var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
-	
-	// calculate delta
-    if (bg[0].delta) {
-        var delta = Math.round(bg[0].delta);
-    } else if (bg[1] && bg[0].date - bg[1].date > 200000 ) {
-        var delta = Math.round(bg[0].glucose - bg[1].glucose);
-    } else if (bg[2] && bg[0].date - bg[2].date > 200000 ) {
-        var delta = Math.round(bg[0].glucose - bg[2].glucose);
-    } else if (bg[3] && bg[0].date - bg[3].date > 200000 ) {
-        var delta = Math.round(bg[0].glucose - bg[3].glucose);
-    } else {
-        var delta = 0;
-    }
-
-    //display BG number
-    display.oled.setCursor(0,13);
-    display.oled.writeString(font, 2, ""+convertBg(bg[0].glucose, profile), 1, false, 0, false);
+  // calculate BG age
+  var startDate = new Date(bg[0].date);
+  var endDate = new Date();
+  var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
+  
+  // calculate delta
+  if (bg[0].delta) {
+      var delta = Math.round(bg[0].delta);
+  } else if (bg[1] && bg[0].date - bg[1].date > 200000 ) {
+      var delta = Math.round(bg[0].glucose - bg[1].glucose);
+  } else if (bg[2] && bg[0].date - bg[2].date > 200000 ) {
+      var delta = Math.round(bg[0].glucose - bg[2].glucose);
+  } else if (bg[3] && bg[0].date - bg[3].date > 200000 ) {
+      var delta = Math.round(bg[0].glucose - bg[3].glucose);
+  } else {
+      var delta = 0;
+  }
+  
+  //display BG number
+  display.oled.setCursor(0,14);
+  display.oled.writeString(font, 2, ""+convertBg(bg[0].glucose, profile), 1, false, 0, false);
     
 	// display BG trend arrow (or if old, cross bg and show age in min)
 	var curPos = display.oled.cursor_x + 1 ;
     if (minutes >= 11 ){
-      display.oled.fillRect(0, 21, curPos, 3, 1, false);
+      display.oled.fillRect(0, 20, curPos, 3, 1, false);
       
       display.oled.setCursor(curPos+5,13);
       display.oled.writeString(font, 1, minutes+"'", 1, false, 0, false);      
@@ -125,14 +103,14 @@ if(bg && profile) {
       //display.oled.fillRect(curPos, 15, 1, 3, 1, false);
     } else if (delta) {
       if (delta >= 5) {
-        drawArrowUp(display, curPos+3, 18);
+        drawArrowUp(display, curPos+3, 12);
       } else if ( delta <= -5){
-        drawArrowDown(display, curPos+3, 18);
+        drawArrowDown(display, curPos+3, 12);
       }
       if (delta >= 10) {
-        drawArrowUp(display, curPos+10, 18);
+        drawArrowUp(display, curPos+10, 12);
       } else if ( delta <= -10){
-        drawArrowDown(display, curPos+10, 18);
+        drawArrowDown(display, curPos+10, 12);
       }
     }
 }
@@ -140,22 +118,45 @@ if(bg && profile) {
 //display IOB
 if(iob) {
   var iob = round(iob[0].iob, 1).toFixed(1);
-	if (iob >= 10.0) {
-		display.oled.setCursor(99,13);
-	} else {
-		display.oled.setCursor(105,13);
+  var xOffset = 55;
+  if (iob > 0) {
+    xOffset += 6;  
+  }
+	if (Math.abs(iob) < 10.0) {
+    xOffset += 6;
 	}
+  display.oled.setCursor(xOffset,13);
   display.oled.writeString(font, 1, iob+"U", 1, false, 0, false);
 }
 
 // display COB
 if(cob) {
-	if (cob.mealCOB >= 10.0) {
-		display.oled.setCursor(99,22);
-	} else {
-		display.oled.setCursor(105,22);
+  var xOffset = 61;
+	if (Math.abs(iob) < 10.0) {
+    xOffset += 6;
 	}
+  display.oled.setCursor(xOffset,22);
 	display.oled.writeString(font, 1, round(cob.mealCOB, 1).toFixed(1)+"g", 1, false, 0, false);
+}
+
+//calculate timeago for last successful loop
+if(loopSuccess) {
+  var startDate = new Date(loopSuccess.mtime);
+  var endDate = new Date();
+  var minutes = Math.round(( (endDate.getTime() - startDate.getTime()) / 1000) / 60);
+
+  //display last loop time
+  if (status.suspended == true){
+	drawLoopIcon(display,95,12,true,true);
+  } else if (minutes > 9){
+	drawLoopIcon(display,95,12,true);
+  } else{
+	drawLoopIcon(display,95,12,false);
+	display.oled.setCursor(116,15);
+	display.oled.writeString(font, 2, minutes+"'", 1, false, 0, false);
+  }
+} else {
+  drawLoopIcon(display,95,12,true);
 }
 
 //dim the display
