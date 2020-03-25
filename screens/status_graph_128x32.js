@@ -31,7 +31,7 @@ function graphicalStatus(display, openapsDir, pumpPref) {
 //clear display buffer
 display.oled.clearDisplay(true); 
 
-drawSymbolLine(display, openapsDir, pumpPref);
+//drawSymbolLine(display, openapsDir, pumpPref);
 
 //
 // BEGIN Graph Status
@@ -87,24 +87,24 @@ try {
 
 
 //display bg graph axes
-display.oled.drawLine(0, 16, 0, 63, 1, false);
-display.oled.drawLine(1, 63, 127, 63, 1, false);
+display.oled.drawLine(0, 0, 0, 31, 1, false);
+display.oled.drawLine(1, 31, 127, 31, 1, false);
 
 //display target range
-// 16 to 62 is drawing line for BG 30 to 250
-// --> BG range 220 => pixel 46
-// --> 5mg/dl per pixel
-var targetLow = 48; // 70/5=14 -> 62-14=48
-var targetHigh = 27; // 180/5=35 -> 62-35=27
+// 0 to 31 is drawing line for BG 30 to 250
+// --> BG range 220 => pixel 32
+// --> 7mg/dl per pixel
+var targetLow = 21; // 70/7=10 -> 31-10=21
+var targetHigh = 6; // 180/7=25 -> 31-25=6
 display.oled.drawLine(1, targetHigh, 2, targetHigh, 1, false);
 display.oled.drawLine(1, targetLow, 2, targetLow, 1, false);
 
 
 // draw line for target (or tmpTarget if set)
 if (tmpTarget && tmpTarget[0].remainingDuration && tmpTarget[0].remainingDuration > 0){
-  var target = 62-tmpTarget[0].targetBottom/5;
+  var target = 31-tmpTarget[0].targetBottom/7;
 } else if (profile && profile.min_bg){
-  var target = 62-profile.min_bg/5;
+  var target = 31-profile.min_bg/7;
 }
 if (target){
   var x0 = 1;
@@ -123,15 +123,15 @@ if (bg) {
 	var lastX = zero_x
     for (var i = 0; i < bg.length; i++) {
         if (bg[i] != null) {
-			var x = zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/5));
+			var x = zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/7));
 			// left and right boundaries
 			if (x < 1) break;
 			if ( x > 127 ) x = 127;
 			
-            var y = Math.round( 62 - (bg[i].glucose/5) );
+            var y = Math.round( 31 - (bg[i].glucose/7) );
             //upper and lower boundaries
-            if ( y < 16 ) y = 16;
-            if ( y > 60 ) y = 60;
+            if ( y < 16 ) y = 0;
+            if ( y > 60 ) y = 31;
 			
 			// save y for this x if not already
 			if (lastX !== x){
@@ -147,7 +147,7 @@ if (bg) {
 	if (suggested && suggested.predBGs != undefined) {
 		//render line between actual BG and predicted
 		x = zero_x + 1;
-		display.oled.drawLine(x, 16, x, 63, 1, false);
+		display.oled.drawLine(x, 0, x, 31, 1, false);
 		// render target range indicatior
 		display.oled.drawLine(x-1, targetHigh, x-2, targetHigh, 1, false);
 		display.oled.drawLine(x-1, targetLow, x-2, targetLow, 1, false);
@@ -160,15 +160,15 @@ if (bg) {
 				//right boundary
 				if ( x > 127 ) x = 127;
 				//upper and lower boundaries
-				if ( y < (21) ) y = (21);
-				if ( y > (51) ) y = (51);
+				if ( y < (0) ) y = (0);
+				if ( y > (31) ) y = (31);
 				display.oled.drawPixel([x, y, 1, false]);
 			}
 		}
 	} else {
 		// draw additional x axis with target range indicator if suggestion is not available
 		x = 127;
-		display.oled.drawLine(x, 16, x, 63, 1, false);
+		display.oled.drawLine(x, 0, x, 31, 1, false);
 		display.oled.drawLine(x-1, targetHigh, x-2, targetHigh, 1, false);
 		display.oled.drawLine(x-1, targetLow, x-2, targetLow, 1, false);
 	}

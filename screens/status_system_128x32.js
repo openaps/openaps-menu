@@ -44,8 +44,6 @@ function systemStatus(display, openapsDir, pumpPref) {
 //clear display buffer
 display.oled.clearDisplay(true); 
 
-drawSymbolLine(display, openapsDir, pumpPref);
-
 //
 // BEGIN System Status
 //
@@ -97,7 +95,7 @@ try {
 	console.error("Status screen display error: could not execute wifiIp: ", e);
 }
 
-var yOffset = 16;
+var yOffset = 0;
 const lineSize = 10;
 
 /*
@@ -158,7 +156,7 @@ if (publicIp){
 	yOffset += lineSize;
 } 
 
-if (yOffset === 16){
+if (yOffset === 0){
   // no network information shown
   drawConnectIcon(display, 0,yOffset, false);
   display.oled.setCursor(13,yOffset);
