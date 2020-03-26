@@ -52,11 +52,6 @@ try {
     console.error("Status screen display error: could not parse pumphistory-24h-zoned.json: ", e);
 }
 try {
-    var status = JSON.parse(fs.readFileSync(openapsDir+"/monitor/status.json"));
-} catch (e) {
-    console.error("Status screen display error: could not parse status.json: ", e);
-}
-try {
     var suggested = JSON.parse(fs.readFileSync(openapsDir+"/enact/suggested.json"));
 } catch (e) {
     console.error("Status screen display error: could not parse suggested.json: ", e);
@@ -117,31 +112,34 @@ if (target){
 var ylons = []; // save y values of BGs for later use
 if (bg) {
 	//fill the whole graph with BGs if there are no predictions
-    var numBGs = ((suggested != undefined) && (suggested.predBGs != undefined)) ? (72) : (120);
-    var zerotime = Date.now() - ((numBGs * 5) * 600);
-    var zero_x = numBGs + 5;
+	var numBGs = ((suggested != undefined) && (suggested.predBGs != undefined)) ? (72) : (120);
+	var zerotime = Date.now() - ((numBGs * 5) * 600);
+	var zero_x = numBGs + 5;
 	var lastX = zero_x
-    for (var i = 0; i < bg.length; i++) {
-        if (bg[i] != null) {
+	for (var i = 0; i < bg.length; i++) {
+		if (bg[i] != null) {
 			var x = zero_x + Math.round(((((bg[i].date - zerotime)/1000)/60)/7));
 			// left and right boundaries
 			if (x < 1) break;
 			if ( x > 127 ) x = 127;
-			
-            var y = Math.round( 31 - (bg[i].glucose/7) );
-            //upper and lower boundaries
-            if ( y < 16 ) y = 0;
-            if ( y > 60 ) y = 31;
+
+			if (bg[i].glucose > 250){
+				var y = 0;
+			} else if (bg[i].glucose < 30){
+				var y = 31;
+			} else{
+				var y = Math.round( 31 - (bg[i].glucose/7 ));
+			}
 			
 			// save y for this x if not already
 			if (lastX !== x){
 				ylons.push(y);
 				lastX = x;
 			}
-			
-            display.oled.drawPixel([x, y, 1], false);
-        }
-    }
+
+			display.oled.drawPixel([x, y, 1], false);
+		}
+	}
 
 	//render predictions on the graph, but only if we have them
 	if (suggested && suggested.predBGs != undefined) {
@@ -156,12 +154,16 @@ if (bg) {
 		for (i = 0; i <= 48; i++) {
 			x++;
 			for(var n = 0; n < 4 && (predictions[n] != undefined); n++) {
-				y = Math.round( (21) - ( (predictions[n][i] - 250 ) / 8) );
 				//right boundary
-				if ( x > 127 ) x = 127;
-				//upper and lower boundaries
-				if ( y < (0) ) y = (0);
-				if ( y > (31) ) y = (31);
+				if ( x > 127 ) break;
+				
+				if (predictions[n][i] > 250){
+					var y = 0;
+				} else if (predictions[n][i] < 30){
+					var y = 31;
+				} else{
+					var y = Math.round(  31 - (predictions[n][i] / 7 ));
+				}
 				display.oled.drawPixel([x, y, 1, false]);
 			}
 		}
@@ -176,29 +178,29 @@ if (bg) {
 
 // render bolus "injections"
 if (pumpHistory){
-	var numBGs = (numBGs) ? numBGs : 120;
-    var zerotime = (zerotime) ? zerotime : Date.now() - ((numBGs * 5) * 600);
-    var zero_x = numBGs + 5;
+  var numBGs = (numBGs) ? numBGs : 120;
+  var zerotime = (zerotime) ? zerotime : Date.now() - ((numBGs * 5) * 600);
+  var zero_x = numBGs + 5;
 	
-    for (var i = 0; i < pumpHistory.length; i++) {
-        if (pumpHistory[i] !== null 
-			&& pumpHistory[i]._type !== null
-			&& pumpHistory[i]._type.toLowerCase() === "bolus") {
-				var bolus = pumpHistory[i].amount;
-				var bolusDate = new Date(pumpHistory[i].timestamp);
-            
-				var x = zero_x + Math.round(((((bolusDate - zerotime)/1000)/60)/5));
-				if (x < 1) break;
-				if ( x > 127 ) x = 127;
-				
-				// print bolus but smb a bit smaller
-				if (bolus > 1){
-					display.oled.fillRect(x, 58, 2, 5, 1, false);
-				} else {
-					display.oled.fillRect(x, 61, 2, 2, 1, false);
-				}
-        }
+  for (var i = 0; i < pumpHistory.length; i++) {
+    if (pumpHistory[i] !== null 
+    && pumpHistory[i]._type !== null
+    && pumpHistory[i]._type.toLowerCase() === "bolus") {
+      var bolus = pumpHistory[i].amount;
+      var bolusDate = new Date(pumpHistory[i].timestamp);
+          
+      var x = zero_x + Math.round(((((bolusDate - zerotime)/1000)/60)/5));
+      if (x < 1) break;
+      if ( x > 127 ) x = 127;
+      
+      // print bolus but smb a bit smaller
+      if (bolus > 1){
+      	display.oled.fillRect(x, 26, 2, 5, 1, false);
+      } else {
+      	display.oled.fillRect(x, 29, 2, 2, 1, false);
+      }
     }
+  }
 }
 
 // render meals
@@ -219,7 +221,7 @@ if (carbHistory){
 				//console.log(x)
 
 				var y = (ylons[x-1] != null) ? ylons[x-1] : 16;
-				if (y < 20) y = 25; // when value is high, place carbs in the middle to make them visible
+				//y = (y < 5) y = 25; // when value is high, place carbs in the middle to make them visible
         
 				drawDot(display,x, y);
 		}
