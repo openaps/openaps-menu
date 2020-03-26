@@ -131,8 +131,8 @@ if(iob) {
 
 // display COB
 if(cob) {
-  var xOffset = 61;
-	if (Math.abs(iob) < 10.0) {
+  var xOffset = 67;
+	if (cob < 10.0) {
     xOffset += 6;
 	}
   display.oled.setCursor(xOffset,22);
