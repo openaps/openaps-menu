@@ -1,6 +1,6 @@
 {
   "gpios": {
-    "buttonUp": 12,
+    "buttonUp": 5,
     "buttonDown": 6
   },
   "options": {

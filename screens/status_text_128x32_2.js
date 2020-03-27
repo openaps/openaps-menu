@@ -85,7 +85,7 @@ if (target){
 // show tmp basal info
 if(tmpBasal) {
   var rate = round(tmpBasal.rate,1).toFixed(1);
-  var xOffset = 49;
+  var xOffset = 51;
 	if (rate < 10.0) {
     xOffset += 6;
 	}
