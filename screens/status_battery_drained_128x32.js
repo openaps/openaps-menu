@@ -66,7 +66,7 @@ function drawBatteryDrainedIcon (display, x0, y0){
 module.exports = function (display){
   display.clear();
 
-  drawBatteryDrainedIcon(display, 45, 5);
+  drawBatteryDrainedIcon(display, 5, 5);
   
   // show time when shutting down
   //var shutdownDate = new Date();
@@ -74,13 +74,12 @@ module.exports = function (display){
   // hour = (hour < 10 ? "0" : "") + hour;
   // var min  = shutdownDate.getMinutes();
   // min = (min < 10 ? "0" : "") + min;
-  display.oled.setCursor(1,35);
-  display.oled.writeString(font, 1, "The rig will shut", 1, false, 0, false);
-  display.oled.setCursor(1,45);
-  // display.oled.writeString(font, 1, "at "+hour+":"+min+" due to a low", 1, false, 0, false);
-  display.oled.writeString(font, 1, "down soon due to", 1, false, 0, false);
-  display.oled.setCursor(1,55);
-  display.oled.writeString(font, 1, "the low battery. ", 1, false, 0, false);
+  display.oled.setCursor(52,1);
+  display.oled.writeString(font, 1, "The rig will", 1, false, 0, false);
+  display.oled.setCursor(52,11);
+  display.oled.writeString(font, 1, "shut down", 1, false, 0, false);
+  display.oled.setCursor(52,21);
+  display.oled.writeString(font, 1, "soon...", 1, false, 0, false);
   
   
   //dim the display

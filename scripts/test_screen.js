@@ -57,5 +57,5 @@ try {
     }
 }
 
-require('../screens/status_graph_128x32.js')(display, openapsDir, pumpPref);
+require('../screens/status_battery_drained_128x32.js')(display, openapsDir, pumpPref);
 //require('./icon_test.js')(display, openapsDir, pumpPref);
