@@ -1,0 +1,159 @@
+[
+  {
+    "label": "OpenAPS",
+    "menu": [
+      {
+        "label": "Status Graph",
+        "emit": "showgraphstatus"
+      },
+      {
+        "label": "Big BG Status",
+        "emit": "showbigBGstatus"
+      },
+      {
+        "label": "Set Temp Target",
+        "menu": [
+            {
+                "label": "Cancel temp targets",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 0 0 | head -1 | jq . | fold -w 23 -s",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Eating Soon: 60m@80",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Speaking: 45m@110",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 110 45 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Walking: 45m@120",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 120 45 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            },
+            {
+                "label": "Running: 60m@140",
+                "command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 140 60 | head -1 | jq . | fold -w 23 -s | head -8",
+                "emit": "showoutput"
+            }
+        ]
+      },
+      {
+        "label": "Status Text",
+        "command": "./scripts/getstatus.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Enacted Reason",
+        "command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 23",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Show pump-loop.log",
+        "command": "cat /var/log/openaps/pump-loop.log | fold -w 23 -s | grep -av '.......................' | tail -8",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Unicorn Logo",
+        "emit": "showlogo"
+      }
+    ]
+  },
+  {
+    "label": "Wifi",
+    "menu": [
+      {
+        "label": "Current Wifi Network",
+        "command": "./scripts/getwifi.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Current Hostname",
+        "command": "./scripts/gethostname.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Current IP Address",
+        "command": "./scripts/getip.sh",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Show network.log",
+        "command": "cat /var/log/openaps/network.log | fold -w 23 -s | tail -8",
+        "emit": "showoutput"
+      },
+      {
+        "label": "Select Open Wifi Net",
+        "options": "./scripts/list_open_wifi.sh",
+        "selectScript": "./scripts/add_open_wifi.sh",
+        "selectEmit": "showoutput"
+      }
+    ]
+  },
+  {
+    "label": "System",
+    "menu": [
+        {
+            "label": "Voltage",
+            "emit": "showvoltage"
+        },
+        {
+            "label": "Display Tests",
+            "menu": [
+                {
+                    "label": "Checkerboard 1",
+                    "command": "node scripts/display_image.js ./static/cb1.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "Checkerboard 2",
+                    "command": "node scripts/display_image.js ./static/cb2.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "All On",
+                    "command": "node scripts/display_image.js ./static/allon.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "Boxes 1",
+                    "command": "node scripts/display_image.js ./static/boxs1.png",
+                    "emit": "nothing"
+                },
+                {
+                    "label": "Boxes 2",
+                    "command": "node scripts/display_image.js ./static/boxs2.png",
+                    "emit": "nothing"
+                }
+            ]
+        },
+        {
+            "label": "lsusb",
+            "command": "lsusb | fold -w 20 -s",
+            "emit": "showoutput"
+        },
+        {
+            "label": "Reboot",
+            "command": "echo Rebooting in; echo 1 minute; shutdown -r",
+            "emit": "showoutput"
+        },
+        {
+            "label": "Cancel Reboot",
+            "command": "shutdown -c; echo Reboot canceled",
+            "emit": "showoutput"
+        },
+        {
+            "label": "Reboot NOW",
+            "command": "node scripts/display_image.js ./static/black.png; shutdown -r now;",
+            "emit": "nothing"
+        },
+        {
+            "label": "Shutdown",
+            "command": "node scripts/display_image.js ./static/black.png; shutdown -P now",
+            "emit": "nothing"
+        }
+    ]
+  }
+]
