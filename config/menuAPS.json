@@ -35,36 +35,6 @@
 	]
   },
   {
-	"label": "Set Smart Bolus",
-	"menu": [
-		{
-			"label": "Cancel smart bolus",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 0 0 | head -1 | jq . | fold -w 23 -s",
-			"emit": "showoutput"
-		},
-		{
-			"label": "Eating (~10g)",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
-			"emit": "showoutput"
-		},
-		{
-			"label": "Eating (~30g)",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
-			"emit": "showoutput"
-		},
-		{
-			"label": "Eating (~60g)",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
-			"emit": "showoutput"
-		},
-		{
-			"label": "Eating (~100g)",
-			"command": "cd ~/myopenaps && PATH=$PATH:/opt/nodejs/bin/ oref0-append-local-temptarget 80 60 | head -1 | jq . | fold -w 23 -s | head -8",
-			"emit": "showoutput"
-		}
-	]
-  },
-  {
 	"label": "Enacted Reason",
 	"command": "cat ~/myopenaps/enact/enacted.json | jq .reason | fold -w 22",
 	"emit": "showoutput"
